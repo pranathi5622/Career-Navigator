@@ -1,0 +1,682 @@
+{% extends 'base.html' %}
+
+{% block title %}Career Path Explorer - Career Compass{% endblock %}
+
+{% block content %}
+<!-- Header section -->
+<section class="py-5 bg-primary text-white">
+    <div class="container">
+        <div class="text-center">
+            <h1 class="display-5 fw-bold">Career Path Explorer</h1>
+            <p class="lead">Visualize your journey with interactive milestones</p>
+        </div>
+    </div>
+</section>
+
+<!-- Main content section -->
+<section class="py-5">
+    <div class="container">
+        <!-- Career selection form -->
+        <div class="row justify-content-center mb-5">
+            <div class="col-md-8">
+                <div class="card shadow-sm">
+                    <div class="card-body p-4">
+                        <h3 class="card-title mb-4">Select a Career Path to Explore</h3>
+                        <form method="POST" action="{{ url_for('career_path_explorer') }}">
+                            <div class="mb-3">
+                                <label for="career" class="form-label">Career</label>
+                                <select class="form-select" id="career" name="career" required>
+                                    <option value="" selected disabled>Choose a career...</option>
+                                    {% for career in careers %}
+                                        <option value="{{ career }}" {% if selected_career == career %}selected{% endif %}>
+                                            {{ career }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary btn-lg">Explore Career Path</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Career path visualization (shown only when a career is selected) -->
+        {% if career_path %}
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-secondary text-white">
+                            <h3 class="mb-0">{{ career_path.career }} Path</h3>
+                        </div>
+                        <div class="card-body p-4">
+                            <p class="lead mb-4">{{ career_path.description }}</p>
+                            
+                            <!-- Animated interactive timeline -->
+                            <div class="career-timeline-container">
+                                <div class="career-timeline">
+                                    {% for milestone in career_path.milestones %}
+                                        <div class="timeline-milestone milestone-{{ milestone.level }} fade-in" 
+                                             data-level="{{ milestone.level }}"
+                                             data-aos="fade-up" 
+                                             data-aos-delay="{{ loop.index * 100 }}">
+                                            <div class="milestone-marker">
+                                                <div class="milestone-icon">
+                                                    {% if milestone.level == 'entry' %}
+                                                        <i class="fas fa-play"></i>
+                                                    {% elif milestone.level == 'mid' %}
+                                                        <i class="fas fa-users"></i>
+                                                    {% elif milestone.level == 'senior' %}
+                                                        <i class="fas fa-chart-line"></i>
+                                                    {% elif milestone.level == 'expert' %}
+                                                        <i class="fas fa-crown"></i>
+                                                    {% endif %}
+                                                </div>
+                                                <div class="milestone-year">{{ milestone.years }}</div>
+                                            </div>
+                                            <div class="milestone-content">
+                                                <h4 class="milestone-title">{{ milestone.title }}</h4>
+                                                <p class="milestone-description">{{ milestone.description }}</p>
+                                                <div class="milestone-details-toggle" data-bs-toggle="collapse" 
+                                                     data-bs-target="#milestone-details-{{ loop.index }}" 
+                                                     aria-expanded="false">
+                                                    <span class="details-show">Show Details <i class="fas fa-chevron-down ms-1"></i></span>
+                                                    <span class="details-hide">Hide Details <i class="fas fa-chevron-up ms-1"></i></span>
+                                                </div>
+                                                
+                                                <div class="collapse milestone-details" id="milestone-details-{{ loop.index }}">
+                                                    <div class="milestone-details-content">
+                                                        <div class="row g-4">
+                                                            <div class="col-md-6">
+                                                                <div class="detail-card">
+                                                                    <h5><i class="fas fa-briefcase me-2"></i> Typical Roles</h5>
+                                                                    <ul class="mb-0">
+                                                                        {% for role in milestone.roles %}
+                                                                            <li>{{ role }}</li>
+                                                                        {% endfor %}
+                                                                    </ul>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <div class="detail-card">
+                                                                    <h5><i class="fas fa-graduation-cap me-2"></i> Education</h5>
+                                                                    <p class="mb-0">{{ milestone.education }}</p>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <div class="detail-card">
+                                                                    <h5><i class="fas fa-cogs me-2"></i> Key Skills</h5>
+                                                                    <div>
+                                                                        {% for skill in milestone.skills %}
+                                                                            <span class="badge bg-info me-1 mb-1">{{ skill }}</span>
+                                                                        {% endfor %}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <div class="detail-card">
+                                                                    <h5><i class="fas fa-dollar-sign me-2"></i> Salary Potential</h5>
+                                                                    <p class="mb-0">{{ milestone.salary }}</p>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <div class="detail-card">
+                                                                    <h5><i class="fas fa-mountain me-2"></i> Key Challenges</h5>
+                                                                    <ul class="mb-0">
+                                                                        {% for challenge in milestone.key_challenges %}
+                                                                            <li>{{ challenge }}</li>
+                                                                        {% endfor %}
+                                                                    </ul>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <div class="detail-card">
+                                                                    <h5><i class="fas fa-chart-pie me-2"></i> Success Metrics</h5>
+                                                                    <ul class="mb-0">
+                                                                        {% for metric in milestone.success_metrics %}
+                                                                            <li>{{ metric }}</li>
+                                                                        {% endfor %}
+                                                                    </ul>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            
+                            <!-- Call to action buttons -->
+                            <div class="mt-5 text-center">
+                                <a href="{{ url_for('roadmap') }}?preselect={{ career_path.career|urlencode }}" class="btn btn-primary btn-lg me-2">
+                                    <i class="fas fa-map-marked-alt me-2"></i> Create Detailed Roadmap
+                                </a>
+                                <a href="{{ url_for('recommendation') }}" class="btn btn-outline-secondary btn-lg">
+                                    <i class="fas fa-search me-2"></i> Explore Other Careers
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Career insights section -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card shadow-sm">
+                        <div class="card-header">
+                            <h3 class="mb-0">Journey Insights</h3>
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="row g-4">
+                                <div class="col-md-4">
+                                    <div class="insight-card text-center p-4 h-100">
+                                        <div class="insight-icon mb-3">
+                                            <i class="fas fa-clock fa-3x text-primary"></i>
+                                        </div>
+                                        <h4>Time Investment</h4>
+                                        <p class="text-muted">Reaching expert level typically takes 10+ years of dedicated practice and experience.</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="insight-card text-center p-4 h-100">
+                                        <div class="insight-icon mb-3">
+                                            <i class="fas fa-lightbulb fa-3x text-warning"></i>
+                                        </div>
+                                        <h4>Skills Evolution</h4>
+                                        <p class="text-muted">As you advance, your focus will shift from technical skills to strategic thinking and leadership.</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="insight-card text-center p-4 h-100">
+                                        <div class="insight-icon mb-3">
+                                            <i class="fas fa-hands-helping fa-3x text-success"></i>
+                                        </div>
+                                        <h4>Mentorship Value</h4>
+                                        <p class="text-muted">Finding mentors at each stage can accelerate your growth and help navigate challenges.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Personal assessment section -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card shadow-sm">
+                        <div class="card-header">
+                            <h3 class="mb-0">Where Are You on This Path?</h3>
+                        </div>
+                        <div class="card-body p-4">
+                            <p class="lead mb-4">Identify your current position and plan your next steps</p>
+                            
+                            <div class="career-stage-selector mb-4">
+                                <div class="form-check form-check-inline current-stage-option" data-stage-target="entry-advice">
+                                    <input class="form-check-input" type="radio" name="currentStage" id="stageEntry" value="entry" checked>
+                                    <label class="form-check-label" for="stageEntry">Entry Level</label>
+                                </div>
+                                <div class="form-check form-check-inline current-stage-option" data-stage-target="mid-advice">
+                                    <input class="form-check-input" type="radio" name="currentStage" id="stageMid" value="mid">
+                                    <label class="form-check-label" for="stageMid">Mid-Level</label>
+                                </div>
+                                <div class="form-check form-check-inline current-stage-option" data-stage-target="senior-advice">
+                                    <input class="form-check-input" type="radio" name="currentStage" id="stageSenior" value="senior">
+                                    <label class="form-check-label" for="stageSenior">Senior Level</label>
+                                </div>
+                                <div class="form-check form-check-inline current-stage-option" data-stage-target="expert-advice">
+                                    <input class="form-check-input" type="radio" name="currentStage" id="stageExpert" value="expert">
+                                    <label class="form-check-label" for="stageExpert">Expert Level</label>
+                                </div>
+                            </div>
+                            
+                            <div class="stage-advice-container">
+                                <div id="entry-advice" class="stage-advice active">
+                                    <div class="alert alert-info">
+                                        <h4 class="alert-heading"><i class="fas fa-info-circle me-2"></i> Entry Level Advice</h4>
+                                        <p>Focus on building fundamentals and gaining practical experience. Consider these next steps:</p>
+                                        <ul>
+                                            <li>Complete foundational courses and certifications</li>
+                                            <li>Build a portfolio of projects to demonstrate your skills</li>
+                                            <li>Network with professionals in your field</li>
+                                            <li>Seek internships or entry-level positions</li>
+                                        </ul>
+                                        <hr>
+                                        <p class="mb-0">This stage is about learning and absorbing as much as possible from experienced mentors.</p>
+                                    </div>
+                                </div>
+                                
+                                <div id="mid-advice" class="stage-advice">
+                                    <div class="alert alert-info">
+                                        <h4 class="alert-heading"><i class="fas fa-info-circle me-2"></i> Mid-Level Advice</h4>
+                                        <p>Develop specialized expertise and take on more challenging projects. Consider these next steps:</p>
+                                        <ul>
+                                            <li>Pursue advanced training in specialized areas</li>
+                                            <li>Take leadership roles on smaller projects</li>
+                                            <li>Begin mentoring newcomers to solidify your knowledge</li>
+                                            <li>Build a reputation for solving complex problems</li>
+                                        </ul>
+                                        <hr>
+                                        <p class="mb-0">This stage is about deepening your expertise and starting to develop leadership skills.</p>
+                                    </div>
+                                </div>
+                                
+                                <div id="senior-advice" class="stage-advice">
+                                    <div class="alert alert-info">
+                                        <h4 class="alert-heading"><i class="fas fa-info-circle me-2"></i> Senior Level Advice</h4>
+                                        <p>Focus on strategic initiatives and developing others. Consider these next steps:</p>
+                                        <ul>
+                                            <li>Lead major projects and initiatives</li>
+                                            <li>Develop and implement best practices</li>
+                                            <li>Mentor mid-level professionals</li>
+                                            <li>Contribute to your organization's strategic direction</li>
+                                        </ul>
+                                        <hr>
+                                        <p class="mb-0">This stage is about leveraging your experience to drive significant value and help others grow.</p>
+                                    </div>
+                                </div>
+                                
+                                <div id="expert-advice" class="stage-advice">
+                                    <div class="alert alert-info">
+                                        <h4 class="alert-heading"><i class="fas fa-info-circle me-2"></i> Expert Level Advice</h4>
+                                        <p>Shape the future of your field and develop next-generation leaders. Consider these next steps:</p>
+                                        <ul>
+                                            <li>Drive organizational vision and strategy</li>
+                                            <li>Speak at industry conferences and publish thought leadership</li>
+                                            <li>Develop innovative approaches to industry challenges</li>
+                                            <li>Build and lead high-performance teams</li>
+                                        </ul>
+                                        <hr>
+                                        <p class="mb-0">This stage is about creating lasting impact and developing the next generation of talent.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <!-- Information about the explorer when no career is selected -->
+            <div class="row g-4">
+                <div class="col-lg-6">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-body p-4">
+                            <h3 class="card-title mb-3">Why Explore Career Paths?</h3>
+                            <p>Understanding the full journey of a career path helps you:</p>
+                            <ul class="feature-list">
+                                <li><i class="fas fa-check-circle text-success me-2"></i> Visualize your long-term career progression</li>
+                                <li><i class="fas fa-check-circle text-success me-2"></i> Set realistic expectations for each career stage</li>
+                                <li><i class="fas fa-check-circle text-success me-2"></i> Identify skills needed for advancement</li>
+                                <li><i class="fas fa-check-circle text-success me-2"></i> Anticipate challenges and prepare for them</li>
+                                <li><i class="fas fa-check-circle text-success me-2"></i> Make informed decisions about your professional development</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-6">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-body p-4">
+                            <h3 class="card-title mb-3">How to Use This Explorer</h3>
+                            <ol class="numbered-instructions">
+                                <li>
+                                    <span class="instruction-number">1</span>
+                                    <div class="instruction-content">
+                                        <h5>Select a Career</h5>
+                                        <p>Choose a career path you're interested in exploring</p>
+                                    </div>
+                                </li>
+                                <li>
+                                    <span class="instruction-number">2</span>
+                                    <div class="instruction-content">
+                                        <h5>Explore Milestones</h5>
+                                        <p>Interact with each career stage to see detailed information</p>
+                                    </div>
+                                </li>
+                                <li>
+                                    <span class="instruction-number">3</span>
+                                    <div class="instruction-content">
+                                        <h5>Identify Your Stage</h5>
+                                        <p>Select your current level to get personalized advice</p>
+                                    </div>
+                                </li>
+                                <li>
+                                    <span class="instruction-number">4</span>
+                                    <div class="instruction-content">
+                                        <h5>Plan Next Steps</h5>
+                                        <p>Use the insights to plan your career development</p>
+                                    </div>
+                                </li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
+
+{% block additional_scripts %}
+<!-- AOS Animation library -->
+<script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize AOS animation library
+        AOS.init({
+            duration: 800,
+            easing: 'ease-in-out',
+            once: true
+        });
+        
+        // Milestone details toggle functionality
+        const detailsToggles = document.querySelectorAll('.milestone-details-toggle');
+        detailsToggles.forEach(toggle => {
+            toggle.addEventListener('click', function() {
+                this.classList.toggle('active');
+            });
+        });
+        
+        // Career stage advice selector
+        const stageOptions = document.querySelectorAll('.current-stage-option');
+        stageOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                // Hide all advice blocks
+                document.querySelectorAll('.stage-advice').forEach(advice => {
+                    advice.classList.remove('active');
+                });
+                
+                // Show selected advice block
+                const targetId = this.getAttribute('data-stage-target');
+                document.getElementById(targetId).classList.add('active');
+                
+                // Highlight the milestone corresponding to the selected stage
+                const stage = this.querySelector('input').value;
+                highlightMilestone(stage);
+            });
+        });
+        
+        // Highlight a milestone based on the selected stage
+        function highlightMilestone(stage) {
+            // Remove highlight from all milestones
+            document.querySelectorAll('.timeline-milestone').forEach(milestone => {
+                milestone.classList.remove('highlighted');
+            });
+            
+            // Add highlight to the selected milestone
+            const targetMilestone = document.querySelector(`.milestone-${stage}`);
+            if (targetMilestone) {
+                targetMilestone.classList.add('highlighted');
+                
+                // Scroll to the milestone
+                targetMilestone.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+            }
+        }
+        
+        // Initialize with entry level highlighted
+        setTimeout(() => {
+            highlightMilestone('entry');
+        }, 1000); // Delay to allow animations to complete
+    });
+</script>
+{% endblock %}
+
+{% block additional_styles %}
+<!-- AOS Animation library styles -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css">
+
+<style>
+    /* Career Timeline Styles */
+    .career-timeline-container {
+        position: relative;
+        padding: 3rem 0;
+    }
+    
+    .career-timeline {
+        position: relative;
+    }
+    
+    .career-timeline::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 3rem;
+        width: 4px;
+        background: linear-gradient(to bottom, var(--bs-primary), var(--bs-danger));
+        border-radius: 4px;
+        transform: translateX(-50%);
+    }
+    
+    .timeline-milestone {
+        position: relative;
+        margin-bottom: 3rem;
+        padding-left: 5rem;
+        opacity: 0;
+        transform: translateY(20px);
+        transition: all 0.5s ease;
+    }
+    
+    .timeline-milestone.fade-in {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    
+    .milestone-marker {
+        position: absolute;
+        top: 0;
+        left: 3rem;
+        transform: translateX(-50%);
+        z-index: 2;
+    }
+    
+    .milestone-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 3rem;
+        height: 3rem;
+        background-color: var(--bs-primary);
+        color: white;
+        border-radius: 50%;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+    
+    .milestone-year {
+        margin-top: 0.5rem;
+        font-size: 0.85rem;
+        font-weight: bold;
+        text-align: center;
+        color: var(--bs-secondary);
+    }
+    
+    .milestone-title {
+        margin-bottom: 0.5rem;
+        color: var(--bs-primary);
+        font-weight: bold;
+    }
+    
+    .milestone-description {
+        margin-bottom: 1rem;
+    }
+    
+    /* Milestone level styling */
+    .milestone-entry .milestone-icon {
+        background-color: var(--bs-primary);
+    }
+    
+    .milestone-mid .milestone-icon {
+        background-color: var(--bs-info);
+    }
+    
+    .milestone-senior .milestone-icon {
+        background-color: var(--bs-warning);
+    }
+    
+    .milestone-expert .milestone-icon {
+        background-color: var(--bs-danger);
+    }
+    
+    /* Milestone details toggle */
+    .milestone-details-toggle {
+        cursor: pointer;
+        color: var(--bs-primary);
+        font-weight: 600;
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        border-radius: 2rem;
+        background-color: rgba(var(--bs-primary-rgb), 0.1);
+        transition: all 0.3s ease;
+    }
+    
+    .milestone-details-toggle:hover {
+        background-color: rgba(var(--bs-primary-rgb), 0.2);
+    }
+    
+    .details-hide {
+        display: none;
+    }
+    
+    .milestone-details-toggle.active .details-show {
+        display: none;
+    }
+    
+    .milestone-details-toggle.active .details-hide {
+        display: inline;
+    }
+    
+    /* Milestone details content */
+    .milestone-details {
+        margin-top: 1.5rem;
+    }
+    
+    .milestone-details-content {
+        padding: 1rem;
+        background-color: rgba(0, 0, 0, 0.02);
+        border-radius: 0.5rem;
+        border-left: 4px solid var(--bs-primary);
+    }
+    
+    .detail-card {
+        padding: 1rem;
+        height: 100%;
+        background-color: white;
+        border-radius: 0.5rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+    
+    .detail-card h5 {
+        color: var(--bs-primary);
+        margin-bottom: 1rem;
+        font-size: 1rem;
+        font-weight: 600;
+    }
+    
+    /* Highlighted milestone */
+    .timeline-milestone.highlighted .milestone-icon {
+        transform: scale(1.2);
+        box-shadow: 0 0 0 6px rgba(var(--bs-primary-rgb), 0.2);
+    }
+    
+    .timeline-milestone.highlighted .milestone-content {
+        transform: translateY(-5px);
+    }
+    
+    /* Stage advice styles */
+    .stage-advice {
+        display: none;
+    }
+    
+    .stage-advice.active {
+        display: block;
+        animation: fadeIn 0.5s ease;
+    }
+    
+    /* Other styling */
+    .insight-card {
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        background-color: white;
+        transition: all 0.3s ease;
+    }
+    
+    .insight-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    }
+    
+    .feature-list li, .numbered-instructions li {
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: start;
+    }
+    
+    .numbered-instructions {
+        list-style: none;
+        padding: 0;
+    }
+    
+    .instruction-number {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 2rem;
+        height: 2rem;
+        background-color: var(--bs-primary);
+        color: white;
+        border-radius: 50%;
+        font-weight: bold;
+        margin-right: 1rem;
+        flex-shrink: 0;
+    }
+    
+    .instruction-content {
+        flex: 1;
+    }
+    
+    .instruction-content h5 {
+        margin-bottom: 0.25rem;
+    }
+    
+    .instruction-content p {
+        margin-bottom: 0;
+        color: var(--bs-secondary);
+    }
+    
+    /* Animation keyframes */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* Responsive styles */
+    @media (min-width: 768px) {
+        .career-timeline::before {
+            left: 6rem;
+        }
+        
+        .timeline-milestone {
+            padding-left: 9rem;
+        }
+        
+        .milestone-marker {
+            left: 6rem;
+        }
+        
+        .milestone-icon {
+            width: 4rem;
+            height: 4rem;
+            font-size: 1.25rem;
+        }
+    }
+</style>
+{% endblock %}

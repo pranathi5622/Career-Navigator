@@ -7,6 +7,7 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 from werkzeug.utils import secure_filename
 import tempfile
 import os.path
+from recommendation_engine import get_typical_roles, get_skills_to_develop, get_education_requirements
 
 # Set up logging
 logging.basicConfig(level=logging.DEBUG)
@@ -366,6 +367,127 @@ def delete_mood_entry(entry_id):
         flash('Mood entry not found.', 'danger')
     
     return redirect(url_for('mood_tracker'))
+
+# Career Path Explorer Routes
+@app.route('/career_path_explorer', methods=['GET', 'POST'])
+def career_path_explorer():
+    """
+    Interactive career path explorer with animated milestones
+    """
+    # Get all available careers for the dropdown
+    careers = get_all_careers()
+    selected_career = None
+    career_path = None
+    
+    if request.method == 'POST':
+        selected_career = request.form.get('career')
+        if selected_career:
+            # Get career details
+            career_details = get_career_details(selected_career)
+            
+            # Generate career path with milestones
+            career_path = {
+                'career': selected_career,
+                'description': career_details.get('description', ''),
+                'milestones': generate_career_milestones(selected_career)
+            }
+            
+    return render_template('career_path_explorer.html', 
+                          careers=careers,
+                          selected_career=selected_career,
+                          career_path=career_path)
+
+def generate_career_milestones(career):
+    """
+    Generate interactive milestones for a career path
+    """
+    career_details = get_career_details(career)
+    
+    # Create milestone stages (entry, mid, senior, expert)
+    milestones = [
+        {
+            'level': 'entry',
+            'title': 'Entry Level',
+            'description': f'Beginning your journey as a {career}',
+            'years': '0-2 years',
+            'roles': get_typical_roles(career, 'entry'),
+            'skills': career_details.get('required_skills', [])[:3],  # Top 3 skills for entry level
+            'education': get_education_requirements(career, 'entry'),
+            'salary': career_details.get('salary_range', '').split('-')[0].strip() if '-' in career_details.get('salary_range', '') else 'Varies',
+            'key_challenges': [
+                f'Learning the fundamentals of {career}',
+                'Building a professional network',
+                'Gaining practical experience'
+            ],
+            'success_metrics': [
+                'Completing basic certifications',
+                'Building a portfolio of work',
+                'Receiving positive performance reviews'
+            ]
+        },
+        {
+            'level': 'mid',
+            'title': 'Mid-Level Professional',
+            'description': f'Developing expertise as a {career}',
+            'years': '3-5 years',
+            'roles': get_typical_roles(career, 'mid'),
+            'skills': get_skills_to_develop(career, 'mid', []),
+            'education': get_education_requirements(career, 'mid'),
+            'salary': 'Middle of range',
+            'key_challenges': [
+                'Taking on more complex projects',
+                'Developing specialized expertise',
+                'Beginning to mentor others'
+            ],
+            'success_metrics': [
+                'Leading small to medium projects',
+                'Becoming a subject matter expert in specific areas',
+                'Contributing to team growth'
+            ]
+        },
+        {
+            'level': 'senior',
+            'title': 'Senior Professional',
+            'description': f'Leading and innovating as a {career}',
+            'years': '6-10 years',
+            'roles': get_typical_roles(career, 'senior'),
+            'skills': get_skills_to_develop(career, 'senior', []),
+            'education': get_education_requirements(career, 'senior'),
+            'salary': career_details.get('salary_range', '').split('-')[1].strip() if '-' in career_details.get('salary_range', '') else 'Varies',
+            'key_challenges': [
+                'Leading major initiatives',
+                'Developing strategic vision',
+                'Managing team dynamics'
+            ],
+            'success_metrics': [
+                'Driving innovation in your field',
+                'Mentoring junior team members',
+                'Recognized industry expertise'
+            ]
+        },
+        {
+            'level': 'expert',
+            'title': 'Expert / Leadership',
+            'description': f'Shaping the future of {career}',
+            'years': '10+ years',
+            'roles': get_typical_roles(career, 'expert'),
+            'skills': get_skills_to_develop(career, 'expert', []),
+            'education': get_education_requirements(career, 'expert'),
+            'salary': 'Top of range and beyond',
+            'key_challenges': [
+                'Setting vision and direction',
+                'Driving organizational change',
+                'Industry thought leadership'
+            ],
+            'success_metrics': [
+                'Leading organizational strategy',
+                'Contributing to industry standards',
+                'Building and developing high-performing teams'
+            ]
+        }
+    ]
+    
+    return milestones
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
