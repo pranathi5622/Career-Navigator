@@ -446,6 +446,23 @@
                                 
                                 <h5 class="mt-4">Recommended Courses</h5>
                                 <div class="recommended-courses mb-3">
+                                    <!-- Course recommendations based on skill gaps -->
+                                    {% if recommendation.course_recommendations %}
+                                        <div class="mb-3">
+                                            <h6 class="text-muted mb-2">Based on Your Skill Gaps:</h6>
+                                            <ul class="list-group">
+                                                {% for course in recommendation.course_recommendations %}
+                                                    <li class="list-group-item d-flex align-items-center">
+                                                        <span class="badge bg-primary me-2">{{ course.platform }}</span>
+                                                        <span><strong>{{ course.title }}</strong> <small class="text-muted">(for {{ course.skill }})</small></span>
+                                                    </li>
+                                                {% endfor %}
+                                            </ul>
+                                        </div>
+                                    {% endif %}
+                                    
+                                    <!-- General resource recommendations -->
+                                    <h6 class="text-muted mb-2">Popular Resources:</h6>
                                     {% if recommendation.details.resources %}
                                         <ul class="list-group">
                                             {% for resource in recommendation.details.resources %}
@@ -456,7 +473,7 @@
                                             {% endfor %}
                                         </ul>
                                     {% else %}
-                                        <p class="text-muted">No specific courses recommended for this career.</p>
+                                        <p class="text-muted">No specific resources recommended for this career.</p>
                                     {% endif %}
                                 </div>
                             </div>

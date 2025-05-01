@@ -1,8 +1,58 @@
 import logging
 from career_data import get_all_careers, get_career_details
+import random
 
 # Set up logging
 logger = logging.getLogger(__name__)
+
+def get_online_course_recommendations(career, skills, skill_gaps=None):
+    """
+    Generate online course recommendations based on career and skill gaps.
+    
+    Args:
+        career: Career path
+        skills: List of user's current skills
+        skill_gaps: Optional list of skills the user needs to develop (if None, will be inferred)
+    
+    Returns:
+        List of course recommendations with titles and platforms
+    """
+    # Online learning platforms
+    platforms = {
+        "Coursera": ["Introduction to", "Fundamentals of", "Specialization in", "Professional Certificate in", "Master"],
+        "edX": ["Introduction to", "Professional Certificate in", "MicroMasters in", "XSeries Program in"],
+        "Udemy": ["Complete", "Ultimate", "Bootcamp", "Masterclass", "Crash Course in"],
+        "LinkedIn Learning": ["Essential", "Advanced", "Becoming a", "Learning", "Skills in"],
+        "Khan Academy": ["Basics of", "Core Concepts in", "Essentials of"],
+        "Pluralsight": ["Path to", "Fundamentals of", "Getting Started with", "Deep Dive into"],
+        "Codecademy": ["Learn", "Build with", "Skill Path:"]
+    }
+    
+    # If no skill gaps provided, infer them based on career required skills
+    if not skill_gaps:
+        career_details = get_career_details(career)
+        required_skills = career_details.get("required_skills", [])
+        user_skills_lower = [s.lower() for s in skills]
+        skill_gaps = [skill for skill in required_skills 
+                      if not any(s in skill.lower() for s in user_skills_lower)]
+    
+    # Generate course recommendations
+    course_recommendations = []
+    for skill in skill_gaps[:3]:  # Limit to top 3 skill gaps
+        # Select a random platform
+        platform = random.choice(list(platforms.keys()))
+        # Select a random prefix for the course title
+        prefix = random.choice(platforms[platform])
+        # Generate course title
+        course_title = f"{prefix} {skill}"
+        # Add to recommendations
+        course_recommendations.append({
+            "title": course_title,
+            "platform": platform,
+            "skill": skill
+        })
+    
+    return course_recommendations
 
 def get_career_recommendations(interests, skills, values, personality, education, work_environment, limit=5):
     """
@@ -117,11 +167,22 @@ def get_career_recommendations(interests, skills, values, personality, education
             score += 10
             match_reasons.append("Personality match: Social/collaborative role")
         
+        # Calculate skill gaps for this career
+        career_skills = career_details.get("required_skills", [])
+        user_skills_lower = [s.lower() for s in skills]
+        skill_gaps = [skill for skill in career_skills 
+                     if not any(us in skill.lower() for us in user_skills_lower)]
+        
+        # Generate specific course recommendations
+        course_recommendations = get_online_course_recommendations(career, skills, skill_gaps)
+        
+        # Add career recommendation with course suggestions
         recommendations.append({
             "career": career,
             "score": score,
             "match_reasons": match_reasons[:3],  # Top 3 reasons only
-            "details": career_details
+            "details": career_details,
+            "course_recommendations": course_recommendations
         })
     
     # Sort by score and limit results
