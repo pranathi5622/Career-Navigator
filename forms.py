@@ -36,9 +36,7 @@ class CareerForm(FlaskForm):
                              ('trade', 'Trade School/Certificate'),
                              ('selftaught', 'Self-taught/No Formal Degree')
                          ])
-    years_experience = IntegerField('Years of Experience in Related Field', 
-                                validators=[DataRequired(), NumberRange(min=0, max=50)],
-                                description="Enter the number of years of experience you have in fields related to your target career")
+
 
 class ComparisonForm(FlaskForm):
     career1 = SelectField('First Career', validators=[DataRequired()], 

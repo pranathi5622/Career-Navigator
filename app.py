@@ -66,7 +66,15 @@ def roadmap():
         experience_level = request.form.get('experience_level')
         education = request.form.get('education')
         skills = request.form.getlist('skills')  # Get list of all checked skills
-        years_experience = request.form.get('years_experience', type=int, default=0)
+        
+        # Set default years of experience based on experience level
+        experience_map = {
+            'entry': 1,
+            'mid': 4,
+            'senior': 8,
+            'expert': 12
+        }
+        years_experience = experience_map.get(experience_level, 0)
         
         # Basic validation
         if career and experience_level and education and skills:
