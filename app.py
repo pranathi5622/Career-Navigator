@@ -1,5 +1,6 @@
 import os
 import logging
+logging.basicConfig(level=logging.DEBUG)
 from flask import Flask, render_template, redirect, url_for, flash, request, session
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase
@@ -170,18 +171,35 @@ def roadmap_result():
     career = session.get('selected_career')
     experience_level = session.get('experience_level')
     skills = session.get('resume_skills', [])
-    education = session.get('resume_education', [])
+    education = session.get('resume_education', '')
     experience = session.get('resume_experience', 0)
     
-    # Get career roadmap
-    career_details = get_career_details(career)
-    roadmap = get_career_roadmap(career, experience_level, skills, education, experience)
+    # Check if we have the necessary data
+    if not career or not experience_level:
+        flash('Missing required career information. Please fill out the form again.', 'danger')
+        return redirect(url_for('roadmap'))
     
-    return render_template('result.html', 
-                          result_type='roadmap',
-                          career=career,
-                          career_details=career_details,
-                          roadmap=roadmap)
+    try:
+        # Get career roadmap
+        career_details = get_career_details(career)
+        roadmap = get_career_roadmap(career, experience_level, skills, education, experience)
+        
+        # For debugging
+        app.logger.debug(f"Career: {career}")
+        app.logger.debug(f"Experience Level: {experience_level}")
+        app.logger.debug(f"Skills: {skills}")
+        app.logger.debug(f"Education: {education}")
+        app.logger.debug(f"Experience: {experience}")
+        
+        return render_template('result.html', 
+                              result_type='roadmap',
+                              career=career,
+                              career_details=career_details,
+                              roadmap=roadmap)
+    except Exception as e:
+        app.logger.error(f"Error generating roadmap: {str(e)}")
+        flash(f'Error generating roadmap: {str(e)}', 'danger')
+        return redirect(url_for('roadmap'))
 
 @app.route('/comparison_result')
 def comparison_result():
