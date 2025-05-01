@@ -1,0 +1,177 @@
+{% extends 'base.html' %}
+
+{% block title %}Resume Optimization Results - Career Compass{% endblock %}
+
+{% block content %}
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h1 class="display-5 fw-bold">Resume Optimization Results</h1>
+            {% if results.target_career %}
+            <p class="lead">Customized suggestions for your <strong>{{ results.target_career }}</strong> career path</p>
+            {% else %}
+            <p class="lead">Suggestions to strengthen your resume</p>
+            {% endif %}
+        </div>
+        
+        <div class="row">
+            <!-- Overall Score Card -->
+            <div class="col-lg-4 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <h3 class="card-title mb-3">Resume Score</h3>
+                        
+                        <div class="score-circle mb-3 mx-auto">
+                            <div class="score-number">{{ results.overall_score }}</div>
+                        </div>
+                        
+                        {% if results.overall_score >= 90 %}
+                            <div class="alert alert-success mb-0">
+                                <strong>Excellent!</strong> Your resume is well-optimized.
+                            </div>
+                        {% elif results.overall_score >= 70 %}
+                            <div class="alert alert-success mb-0">
+                                <strong>Good job!</strong> Your resume is solid with some room for improvement.
+                            </div>
+                        {% elif results.overall_score >= 50 %}
+                            <div class="alert alert-warning mb-0">
+                                <strong>Needs work.</strong> Consider implementing our suggestions to strengthen your resume.
+                            </div>
+                        {% else %}
+                            <div class="alert alert-danger mb-0">
+                                <strong>Significant improvements needed.</strong> Follow our recommendations to transform your resume.
+                            </div>
+                        {% endif %}
+                        
+                        {% if results.keyword_match_percentage is not none %}
+                        <div class="mt-4">
+                            <h5>Career Keyword Match</h5>
+                            <div class="progress" style="height: 20px;">
+                                <div class="progress-bar 
+                                    {% if results.keyword_match_percentage >= 70 %}bg-success
+                                    {% elif results.keyword_match_percentage >= 40 %}bg-warning
+                                    {% else %}bg-danger{% endif %}" 
+                                    role="progressbar" 
+                                    style="width: {{ results.keyword_match_percentage }}%;" 
+                                    aria-valuenow="{{ results.keyword_match_percentage }}" 
+                                    aria-valuemin="0" 
+                                    aria-valuemax="100">{{ results.keyword_match_percentage }}%</div>
+                            </div>
+                            <div class="text-muted mt-2 small">Percentage of relevant career keywords found in your resume</div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Suggestions Area -->
+            <div class="col-lg-8">
+                <!-- General Suggestions -->
+                {% if results.general_suggestions %}
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header">
+                        <h3 class="mb-0">General Improvements</h3>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="list-group list-group-flush">
+                            {% for suggestion in results.general_suggestions %}
+                            <div class="list-group-item list-group-item-action">
+                                <div class="d-flex w-100 justify-content-between align-items-center">
+                                    <h5 class="mb-1">{{ suggestion.title }}</h5>
+                                    <span class="badge 
+                                        {% if suggestion.impact == 'Critical' %}bg-danger
+                                        {% elif suggestion.impact == 'High' %}bg-warning
+                                        {% else %}bg-info{% endif %}">
+                                        {{ suggestion.impact }} Impact
+                                    </span>
+                                </div>
+                                <p class="mb-1">{{ suggestion.description }}</p>
+                                <small class="text-muted">{{ suggestion.category }}</small>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Career-Specific Suggestions -->
+                {% if results.career_specific_suggestions %}
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="mb-0">{{ results.target_career }} Specific Improvements</h3>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="list-group list-group-flush">
+                            {% for suggestion in results.career_specific_suggestions %}
+                            <div class="list-group-item list-group-item-action">
+                                <div class="d-flex w-100 justify-content-between align-items-center">
+                                    <h5 class="mb-1">{{ suggestion.title }}</h5>
+                                    <span class="badge 
+                                        {% if suggestion.impact == 'Critical' %}bg-danger
+                                        {% elif suggestion.impact == 'High' %}bg-warning
+                                        {% else %}bg-info{% endif %}">
+                                        {{ suggestion.impact }} Impact
+                                    </span>
+                                </div>
+                                <p class="mb-1">{{ suggestion.description }}</p>
+                                <small class="text-muted">{{ suggestion.category }}</small>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Next Steps -->
+                <div class="card shadow-sm">
+                    <div class="card-header">
+                        <h3 class="mb-0">Next Steps</h3>
+                    </div>
+                    <div class="card-body">
+                        <ol class="mb-0">
+                            <li class="mb-2">Update your resume based on the suggestions above</li>
+                            <li class="mb-2">Once updated, run another optimization check to see your improved score</li>
+                            <li class="mb-2">Consider having your resume reviewed by a professional in your target field</li>
+                            <li class="mb-2">Tailor your resume for each specific job application</li>
+                        </ol>
+                        
+                        <div class="mt-4 d-grid gap-2">
+                            <a href="{{ url_for('upload_resume', path_type='optimize') }}" class="btn btn-primary">Upload Another Resume</a>
+                            <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">Back to Home</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block additional_head %}
+<style>
+    .score-circle {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #f8f9fa;
+        border: 10px solid 
+            {% if results.overall_score >= 90 %}#198754
+            {% elif results.overall_score >= 70 %}#5cb85c
+            {% elif results.overall_score >= 50 %}#ffc107
+            {% else %}#dc3545{% endif %};
+    }
+    
+    .score-number {
+        font-size: 3rem;
+        font-weight: bold;
+        color: 
+            {% if results.overall_score >= 90 %}#198754
+            {% elif results.overall_score >= 70 %}#5cb85c
+            {% elif results.overall_score >= 50 %}#ffc107
+            {% else %}#dc3545{% endif %};
+    }
+</style>
+{% endblock %}

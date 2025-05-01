@@ -25,7 +25,7 @@
         
         <div class="row g-4">
             <!-- Path 1: Career Roadmap Generator -->
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <div class="card path-card">
                     <div class="card-body text-center p-4">
                         <div class="path-card-icon">
@@ -47,7 +47,7 @@
             </div>
             
             <!-- Path 2: Career Comparison Tool -->
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <div class="card path-card">
                     <div class="card-body text-center p-4">
                         <div class="path-card-icon">
@@ -69,7 +69,7 @@
             </div>
             
             <!-- Path 3: Career Recommendation System -->
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <div class="card path-card">
                     <div class="card-body text-center p-4">
                         <div class="path-card-icon">
@@ -86,6 +86,28 @@
                             </ul>
                         </div>
                         <a href="{{ url_for('recommendation') }}" class="btn btn-primary">Get Recommendations</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Path 4: Resume Optimization -->
+            <div class="col-md-3">
+                <div class="card path-card">
+                    <div class="card-body text-center p-4">
+                        <div class="path-card-icon">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <h3 class="card-title">Resume Optimization</h3>
+                        <p class="card-text">Want to improve your resume? Get personalized suggestions to optimize your resume for your target career.</p>
+                        <div class="card-text text-muted mb-4">
+                            <small>Best for those who:</small>
+                            <ul class="text-start ps-3 mt-2">
+                                <li>Are actively job hunting</li>
+                                <li>Want to strengthen their resume</li>
+                                <li>Need to target specific careers</li>
+                            </ul>
+                        </div>
+                        <a href="{{ url_for('upload_resume', path_type='optimize') }}" class="btn btn-primary">Optimize Resume</a>
                     </div>
                 </div>
             </div>
