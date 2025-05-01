@@ -75,9 +75,9 @@ def roadmap():
             # Store in session for use in results page
             session['selected_career'] = career
             session['experience_level'] = experience_level
-            session['resume_education'] = education  # Using the same session key as before
-            session['resume_skills'] = skills  # Using the same session key as before
-            session['resume_experience'] = years_experience  # Using the same session key as before
+            session['education_level'] = education
+            session['skills'] = skills
+            session['experience_years'] = years_experience
             
             # Go directly to results page
             return redirect(url_for('roadmap_result'))
@@ -98,9 +98,9 @@ def comparison():
         session['career2'] = career2
         
         # Set default empty values for skills and education
-        session['resume_skills'] = []
-        session['resume_education'] = ''
-        session['resume_experience'] = 0
+        session['skills'] = []
+        session['education_level'] = ''
+        session['experience_years'] = 0
         
         return redirect(url_for('comparison_result'))
     
@@ -139,9 +139,9 @@ def roadmap_result():
     # Get data from session
     career = session.get('selected_career')
     experience_level = session.get('experience_level')
-    skills = session.get('resume_skills', [])
-    education = session.get('resume_education', '')
-    experience = session.get('resume_experience', 0)
+    skills = session.get('skills', [])
+    education = session.get('education_level', '')
+    experience = session.get('experience_years', 0)
     
     # Check if we have the necessary data
     if not career or not experience_level:
@@ -175,9 +175,9 @@ def comparison_result():
     # Get data from session
     career1 = session.get('career1')
     career2 = session.get('career2')
-    skills = session.get('resume_skills', [])
-    education = session.get('resume_education', [])
-    experience = session.get('resume_experience', 0)
+    skills = session.get('skills', [])
+    education = session.get('education_level', '')
+    experience = session.get('experience_years', 0)
     
     # Get career comparisons
     career1_details = get_career_details(career1)

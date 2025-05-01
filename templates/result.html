@@ -349,7 +349,7 @@
                                 <p class="mb-0">Based on your profile, here are some recommended next steps:</p>
                                 <ul class="mb-0 mt-2">
                                     {% if comparison.transition_difficulty.level == "Easy" %}
-                                        <li>Update your resume to highlight transferable skills</li>
+                                        <li>Develop and highlight your transferable skills</li>
                                         <li>Network with professionals in the {{ career2 }} field</li>
                                         <li>Look for lateral transfer opportunities within your organization</li>
                                     {% elif comparison.transition_difficulty.level == "Moderate" %}
@@ -422,7 +422,7 @@
                                 <h5>Required Skills</h5>
                                 <div class="mb-3">
                                     {% for skill in recommendation.details.required_skills %}
-                                        <span class="skill-tag {% if skill|lower in session.get('skills', [])|join(' ')|lower or skill|lower in session.get('resume_skills', [])|join(' ')|lower %}matched{% endif %}">{{ skill }}</span>
+                                        <span class="skill-tag {% if skill|lower in session.get('skills', [])|join(' ')|lower %}matched{% endif %}">{{ skill }}</span>
                                     {% endfor %}
                                 </div>
                                 
