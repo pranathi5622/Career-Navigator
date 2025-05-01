@@ -202,18 +202,10 @@ def recommendation_result():
     education = session.get('education', '')
     work_environment = session.get('work_environment', [])
     
-    # Get resume data from session if it exists
-    resume_skills = session.get('resume_skills', [])
-    resume_education = session.get('resume_education', [])
-    
-    # Combine resume and questionnaire data
-    if resume_skills:
-        skills = list(set(skills + resume_skills))
-    
     # Get recommendations
     recommendations = get_career_recommendations(
         interests, skills, values, personality, 
-        education or resume_education, work_environment
+        education, work_environment
     )
     
     return render_template('result.html',
