@@ -59,23 +59,27 @@ def index():
 def roadmap():
     form = CareerForm()
     
-    if form.validate_on_submit():
-        # Store form data in session
-        career = form.career.data
-        experience_level = form.experience_level.data
-        skills = form.skills.data
-        education = form.education.data
-        experience = form.years_experience.data
+    if request.method == 'POST':
+        # Get form data directly from request
+        career = request.form.get('career')
+        experience_level = request.form.get('experience_level')
+        education = request.form.get('education')
+        skills = request.form.getlist('skills')  # Get list of all checked skills
+        years_experience = request.form.get('years_experience', type=int, default=0)
         
-        # Store in session for use in results page
-        session['selected_career'] = career
-        session['experience_level'] = experience_level
-        session['resume_skills'] = skills  # Using the same session key as before
-        session['resume_education'] = education  # Using the same session key as before
-        session['resume_experience'] = experience  # Using the same session key as before
-        
-        # Go directly to results page
-        return redirect(url_for('roadmap_result'))
+        # Basic validation
+        if career and experience_level and education and skills:
+            # Store in session for use in results page
+            session['selected_career'] = career
+            session['experience_level'] = experience_level
+            session['resume_education'] = education  # Using the same session key as before
+            session['resume_skills'] = skills  # Using the same session key as before
+            session['resume_experience'] = years_experience  # Using the same session key as before
+            
+            # Go directly to results page
+            return redirect(url_for('roadmap_result'))
+        else:
+            flash('Please fill out all required fields', 'danger')
     
     return render_template('roadmap.html', form=form, careers=get_all_careers())
 
