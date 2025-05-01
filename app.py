@@ -60,12 +60,22 @@ def roadmap():
     form = CareerForm()
     
     if form.validate_on_submit():
+        # Store form data in session
         career = form.career.data
         experience_level = form.experience_level.data
+        skills = form.skills.data
+        education = form.education.data
+        experience = form.years_experience.data
+        
+        # Store in session for use in results page
         session['selected_career'] = career
         session['experience_level'] = experience_level
+        session['resume_skills'] = skills  # Using the same session key as before
+        session['resume_education'] = education  # Using the same session key as before
+        session['resume_experience'] = experience  # Using the same session key as before
         
-        return redirect(url_for('upload_resume', path_type='roadmap'))
+        # Go directly to results page
+        return redirect(url_for('roadmap_result'))
     
     return render_template('roadmap.html', form=form, careers=get_all_careers())
 

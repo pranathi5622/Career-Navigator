@@ -14,7 +14,7 @@
             <div class="col-lg-8">
                 <div class="card shadow-sm">
                     <div class="card-body p-4">
-                        <h3 class="card-title mb-4">Step 1: Select Your Career</h3>
+                        <h3 class="card-title mb-4">Career Roadmap Details</h3>
                         
                         <form action="{{ url_for('roadmap') }}" method="post" class="needs-validation" novalidate>
                             {{ form.csrf_token }}
@@ -44,11 +44,81 @@
                                 <div class="form-text">This helps us tailor the roadmap to your current stage.</div>
                             </div>
                             
-                            <div class="d-grid gap-2">
-                                <button type="submit" class="btn btn-primary btn-lg">Continue to Resume Upload</button>
-                                <div class="text-center mt-2">
-                                    <small class="text-muted">In the next step, you'll be able to upload your resume for more personalized insights.</small>
+                            <div class="mb-4">
+                                <label for="years_experience" class="form-label">How many years of experience do you have in related fields?</label>
+                                <input type="number" class="form-control" id="years_experience" name="years_experience" min="0" max="50" required>
+                                <div class="invalid-feedback">Please enter a valid number of years (0-50).</div>
+                                <div class="form-text">{{ form.years_experience.description }}</div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label for="education" class="form-label">What is your highest level of education?</label>
+                                <select class="form-select" id="education" name="education" required>
+                                    <option value="">Select your education level</option>
+                                    <option value="highschool">High School Diploma</option>
+                                    <option value="associate">Associate Degree</option>
+                                    <option value="bachelor">Bachelor's Degree</option>
+                                    <option value="master">Master's Degree</option>
+                                    <option value="phd">Doctorate or PhD</option>
+                                    <option value="trade">Trade School/Certificate</option>
+                                    <option value="selftaught">Self-taught/No Formal Degree</option>
+                                </select>
+                                <div class="invalid-feedback">Please select your education level.</div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label class="form-label">What skills do you currently have?</label>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" name="skills" value="analytical" id="skill_analytical">
+                                            <label class="form-check-label" for="skill_analytical">Analytical & Problem-Solving</label>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" name="skills" value="communication" id="skill_communication">
+                                            <label class="form-check-label" for="skill_communication">Communication & Presentation</label>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" name="skills" value="technical" id="skill_technical">
+                                            <label class="form-check-label" for="skill_technical">Technical & Programming</label>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" name="skills" value="creativity" id="skill_creativity">
+                                            <label class="form-check-label" for="skill_creativity">Creativity & Design</label>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" name="skills" value="management" id="skill_management">
+                                            <label class="form-check-label" for="skill_management">Leadership & Management</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" name="skills" value="math" id="skill_math">
+                                            <label class="form-check-label" for="skill_math">Mathematics & Quantitative</label>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" name="skills" value="research" id="skill_research">
+                                            <label class="form-check-label" for="skill_research">Research & Data Analysis</label>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" name="skills" value="interpersonal" id="skill_interpersonal">
+                                            <label class="form-check-label" for="skill_interpersonal">Interpersonal & Teamwork</label>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" name="skills" value="writing" id="skill_writing">
+                                            <label class="form-check-label" for="skill_writing">Writing & Editing</label>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" name="skills" value="languages" id="skill_languages">
+                                            <label class="form-check-label" for="skill_languages">Languages & Linguistics</label>
+                                        </div>
+                                    </div>
                                 </div>
+                                <div class="invalid-feedback">Please select at least one skill.</div>
+                            </div>
+                            
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary btn-lg">Generate Career Roadmap</button>
                             </div>
                         </form>
                     </div>
@@ -71,8 +141,8 @@
                                 <span class="badge bg-primary p-2 rounded-circle">2</span>
                             </div>
                             <div class="ms-3">
-                                <h5>Upload Your Resume</h5>
-                                <p class="text-muted mb-0">We'll analyze your current skills and experience to personalize your roadmap.</p>
+                                <h5>Share Your Background</h5>
+                                <p class="text-muted mb-0">Tell us about your skills, education, and experience to personalize your roadmap.</p>
                             </div>
                         </div>
                         <div class="d-flex">

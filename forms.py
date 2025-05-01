@@ -13,6 +13,32 @@ class CareerForm(FlaskForm):
                                       ('senior', 'Senior Level (6-10 years)'),
                                       ('expert', 'Expert Level (10+ years)')
                                   ])
+    skills = SelectMultipleField('What skills do you currently have?', validators=[DataRequired()],
+                              choices=[
+                                  ('analytical', 'Analytical & Problem-Solving'),
+                                  ('communication', 'Communication & Presentation'),
+                                  ('technical', 'Technical & Programming'),
+                                  ('creativity', 'Creativity & Design'),
+                                  ('management', 'Leadership & Management'),
+                                  ('math', 'Mathematics & Quantitative'),
+                                  ('research', 'Research & Data Analysis'),
+                                  ('interpersonal', 'Interpersonal & Teamwork'),
+                                  ('writing', 'Writing & Editing'),
+                                  ('languages', 'Languages & Linguistics')
+                              ])
+    education = SelectField('What is your highest level of education?', validators=[DataRequired()],
+                         choices=[
+                             ('highschool', 'High School Diploma'),
+                             ('associate', 'Associate Degree'),
+                             ('bachelor', 'Bachelor\'s Degree'),
+                             ('master', 'Master\'s Degree'),
+                             ('phd', 'Doctorate or PhD'),
+                             ('trade', 'Trade School/Certificate'),
+                             ('selftaught', 'Self-taught/No Formal Degree')
+                         ])
+    years_experience = IntegerField('Years of Experience in Related Field', 
+                                validators=[DataRequired(), NumberRange(min=0, max=50)],
+                                description="Enter the number of years of experience you have in fields related to your target career")
 
 class ComparisonForm(FlaskForm):
     career1 = SelectField('First Career', validators=[DataRequired()], 
