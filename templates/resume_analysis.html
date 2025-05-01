@@ -1,0 +1,147 @@
+{% extends "layout.html" %}
+
+{% block title %}Resume Analysis{% endblock %}
+
+{% block content %}
+<section class="form-section">
+    <div class="container">
+        <div class="row mb-4">
+            <div class="col-lg-8 mx-auto text-center">
+                <h2 class="section-title">Resume Analysis</h2>
+                <p class="text-muted">Upload your resume for personalized career recommendations</p>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="card form-card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Resume Upload</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" action="{{ url_for('resume_analysis') }}" enctype="multipart/form-data" class="needs-validation" novalidate>
+                            {{ form.hidden_tag() }}
+                            
+                            <div class="mb-4">
+                                <div class="file-upload-container w-100">
+                                    <label for="resume" class="file-upload-btn w-100">
+                                        <i class="fas fa-file-upload fa-3x mb-3"></i>
+                                        <span>Click or drag to upload your resume</span>
+                                        <small class="d-block mt-2 text-muted">PDF files only (Max 16MB)</small>
+                                    </label>
+                                    {{ form.resume(class="file-upload-input", accept=".pdf") }}
+                                </div>
+                                
+                                <div id="file-name-container" class="file-name-display d-none">
+                                    <i class="fas fa-file-pdf me-2"></i>
+                                    <span id="file-name">No file selected</span>
+                                </div>
+                                
+                                {% if form.resume.errors %}
+                                    <div class="invalid-feedback d-block mt-2">
+                                        {% for error in form.resume.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="alert alert-info" role="alert">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <strong>What happens next?</strong> After uploading your resume, our system will analyze your skills and experience to provide tailored career recommendations.
+                            </div>
+                            
+                            <div class="d-grid gap-2">
+                                {{ form.submit(class="btn btn-primary") }}
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <div class="card mt-4">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">Alternative Options</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>Don't have a resume or prefer not to upload one? Try these alternatives:</p>
+                        <div class="d-flex flex-column flex-md-row gap-2">
+                            <a href="{{ url_for('questionnaire') }}" class="btn btn-outline-primary">Take Questionnaire</a>
+                            <a href="{{ url_for('roadmap') }}" class="btn btn-outline-primary">Create Career Roadmap</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row mb-4">
+            <div class="col-lg-8 mx-auto text-center">
+                <h2 class="section-title">How Resume Analysis Works</h2>
+                <p class="text-muted">Our intelligent system extracts key information from your resume</p>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-3 mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-upload fa-3x text-primary mb-3"></i>
+                        <h4 class="card-title">Upload</h4>
+                        <p class="card-text">Securely upload your resume in PDF format.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-search fa-3x text-primary mb-3"></i>
+                        <h4 class="card-title">Extract</h4>
+                        <p class="card-text">Our system identifies skills, experience, and education from your resume.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-cogs fa-3x text-primary mb-3"></i>
+                        <h4 class="card-title">Analyze</h4>
+                        <p class="card-text">We match your profile with career paths that align with your background.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-lightbulb fa-3x text-primary mb-3"></i>
+                        <h4 class="card-title">Recommend</h4>
+                        <p class="card-text">Receive personalized career suggestions based on your unique profile.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Privacy Notice -->
+<section class="py-4">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="card">
+                    <div class="card-body">
+                        <h5><i class="fas fa-shield-alt me-2"></i>Privacy Notice</h5>
+                        <p class="mb-0">Your resume is analyzed securely on our servers and is not shared with third parties. We extract only the information needed for career recommendations and do not store any personal identification details.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

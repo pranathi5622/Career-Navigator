@@ -1,0 +1,473 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    {% if result_type == 'roadmap' %}
+        Career Roadmap
+    {% elif result_type == 'comparison' %}
+        Career Comparison
+    {% else %}
+        Career Recommendations
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+<section class="results-section">
+    <div class="container">
+        <div class="row mb-4">
+            <div class="col-lg-10 mx-auto text-center">
+                {% if result_type == 'roadmap' %}
+                    <h2 class="section-title">Your Career Roadmap</h2>
+                    <p class="text-muted">A personalized path for your {{ results.career_title }} career journey</p>
+                {% elif result_type == 'comparison' %}
+                    <h2 class="section-title">Career Comparison Results</h2>
+                    <p class="text-muted">Detailed comparison between {{ results.career_one.title }} and {{ results.career_two.title }}</p>
+                {% else %}
+                    <h2 class="section-title">Your Career Recommendations</h2>
+                    <p class="text-muted">Career paths that match your skills and interests</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-lg-10 mx-auto">
+                <!-- Roadmap Results -->
+                {% if result_type == 'roadmap' %}
+                    <div class="card results-card">
+                        <div class="card-header">
+                            <h5 class="mb-0">{{ results.career_title | title }} Career Path</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-4">
+                                <h5 class="mb-3">Career Overview</h5>
+                                <div class="row">
+                                    <div class="col-md-4 mb-3 mb-md-0">
+                                        <div class="card h-100">
+                                            <div class="card-body text-center">
+                                                <h6 class="text-muted mb-2">Salary Range</h6>
+                                                <p class="h5 mb-0">{{ results.career_info.salary_range }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-3 mb-md-0">
+                                        <div class="card h-100">
+                                            <div class="card-body text-center">
+                                                <h6 class="text-muted mb-2">Job Growth</h6>
+                                                <p class="h5 mb-0">{{ results.career_info.job_growth }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="card h-100">
+                                            <div class="card-body text-center">
+                                                <h6 class="text-muted mb-2">Work-Life Balance</h6>
+                                                <p class="h5 mb-0">{{ results.career_info.work_life_balance }} / 5</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <h5 class="mb-3">Your Career Milestones</h5>
+                                <div class="roadmap-container">
+                                    {% for milestone in results.relevant_milestones %}
+                                        <div class="roadmap-milestone">
+                                            <h6 class="milestone-title">{{ milestone.title }}</h6>
+                                            <p class="milestone-level badge bg-secondary">{{ milestone.level }}</p>
+                                            <p class="milestone-description">{{ milestone.description }}</p>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <h5 class="mb-3">Required Skills</h5>
+                                <div class="mb-3">
+                                    {% for skill in results.career_info.skills_required %}
+                                        <span class="skill-badge">{{ skill }}</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <h5 class="mb-3">Learning Resources</h5>
+                                <ul class="resource-list">
+                                    {% for resource in results.career_info.resources %}
+                                        <li class="resource-item">
+                                            <span class="resource-item-title">{{ resource.title }}</span>
+                                            <a href="{{ resource.url }}" target="_blank" class="btn btn-sm btn-outline-primary">Visit</a>
+                                            <span class="resource-item-type">{{ resource.type }}</span>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card results-card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Career Progression Visualization</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container">
+                                <canvas id="roadmapChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                
+                <!-- Comparison Results -->
+                {% elif result_type == 'comparison' %}
+                    <div class="card results-card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Career Comparison</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-4">
+                                <h5 class="mb-3">Salary & Growth Comparison</h5>
+                                <div class="row">
+                                    <div class="col-md-6 mb-4">
+                                        <div class="card h-100">
+                                            <div class="card-header text-center">
+                                                <h6 class="mb-0">Salary Range</h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <table class="table">
+                                                    <tbody>
+                                                        <tr>
+                                                            <th scope="row">{{ results.career_one.title | title }}</th>
+                                                            <td>{{ results.comparison_metrics.salary.career_one }}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th scope="row">{{ results.career_two.title | title }}</th>
+                                                            <td>{{ results.comparison_metrics.salary.career_two }}</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4">
+                                        <div class="card h-100">
+                                            <div class="card-header text-center">
+                                                <h6 class="mb-0">Job Growth</h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <table class="table">
+                                                    <tbody>
+                                                        <tr>
+                                                            <th scope="row">{{ results.career_one.title | title }}</th>
+                                                            <td>{{ results.comparison_metrics.job_growth.career_one }}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th scope="row">{{ results.career_two.title | title }}</th>
+                                                            <td>{{ results.comparison_metrics.job_growth.career_two }}</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <h5 class="mb-3">Quality of Life Comparison</h5>
+                                <div class="row">
+                                    <div class="col-md-4 mb-4">
+                                        <div class="card h-100">
+                                            <div class="card-header text-center">
+                                                <h6 class="mb-0">Work-Life Balance</h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <table class="table">
+                                                    <tbody>
+                                                        <tr>
+                                                            <th scope="row">{{ results.career_one.title | title }}</th>
+                                                            <td>{{ results.comparison_metrics.work_life_balance.career_one }} / 5</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th scope="row">{{ results.career_two.title | title }}</th>
+                                                            <td>{{ results.comparison_metrics.work_life_balance.career_two }} / 5</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-4">
+                                        <div class="card h-100">
+                                            <div class="card-header text-center">
+                                                <h6 class="mb-0">Job Satisfaction</h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <table class="table">
+                                                    <tbody>
+                                                        <tr>
+                                                            <th scope="row">{{ results.career_one.title | title }}</th>
+                                                            <td>{{ results.comparison_metrics.job_satisfaction.career_one }} / 5</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th scope="row">{{ results.career_two.title | title }}</th>
+                                                            <td>{{ results.comparison_metrics.job_satisfaction.career_two }} / 5</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-4">
+                                        <div class="card h-100">
+                                            <div class="card-header text-center">
+                                                <h6 class="mb-0">Job Stability</h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <table class="table">
+                                                    <tbody>
+                                                        <tr>
+                                                            <th scope="row">{{ results.career_one.title | title }}</th>
+                                                            <td>{{ results.comparison_metrics.job_stability.career_one }} / 5</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th scope="row">{{ results.career_two.title | title }}</th>
+                                                            <td>{{ results.comparison_metrics.job_stability.career_two }} / 5</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <h5 class="mb-3">Skill Comparison</h5>
+                                <div class="chart-container mb-4">
+                                    <canvas id="skillsChart"></canvas>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-4">
+                                    <div class="card h-100">
+                                        <div class="card-header text-center">
+                                            <h6 class="mb-0">{{ results.career_one.title | title }} Unique Skills</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="mb-3">
+                                                {% for skill in results.career_one.unique_skills %}
+                                                    <span class="skill-badge">{{ skill }}</span>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-4">
+                                    <div class="card h-100">
+                                        <div class="card-header text-center">
+                                            <h6 class="mb-0">{{ results.career_two.title | title }} Unique Skills</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="mb-3">
+                                                {% for skill in results.career_two.unique_skills %}
+                                                    <span class="skill-badge">{{ skill }}</span>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card mb-4">
+                                <div class="card-header text-center">
+                                    <h6 class="mb-0">Common Skills Between Both Careers</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        {% for skill in results.common_skills %}
+                                            <span class="skill-badge">{{ skill }}</span>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="alert alert-info" role="alert">
+                                <i class="fas fa-lightbulb me-2"></i>
+                                <strong>Pro Tip:</strong> Consider which career aligns better with your personal preferences, strengths, and long-term goals.
+                            </div>
+                        </div>
+                    </div>
+                
+                <!-- Recommendation Results -->
+                {% else %}
+                    <div class="card results-card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Your Career Recommendations</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="alert alert-success mb-4" role="alert">
+                                <i class="fas fa-check-circle me-2"></i>
+                                <strong>Based on your profile,</strong> we've identified these career paths that match your skills, interests, and preferences.
+                            </div>
+                            
+                            <div class="row">
+                                {% for recommendation in results.recommendations %}
+                                <div class="col-lg-6 mb-4">
+                                    <div class="recommendation-card">
+                                        <div class="card-header">
+                                            <h5 class="mb-0">{{ recommendation.title | title }}</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="row mb-3">
+                                                <div class="col-md-6 mb-3 mb-md-0">
+                                                    <div class="recommendation-metric">
+                                                        <div class="recommendation-metric-title">Salary Range</div>
+                                                        <div class="recommendation-metric-value">{{ recommendation.info.salary_range }}</div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="recommendation-metric">
+                                                        <div class="recommendation-metric-title">Job Growth</div>
+                                                        <div class="recommendation-metric-value">{{ recommendation.info.job_growth }}</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <h6 class="mb-2">Top Skills Required:</h6>
+                                            <div class="mb-3">
+                                                {% for skill in recommendation.info.skills_required[:5] %}
+                                                    <span class="skill-badge">{{ skill }}</span>
+                                                {% endfor %}
+                                            </div>
+                                            
+                                            <div class="d-flex justify-content-between align-items-center mt-3">
+                                                <div>
+                                                    <span class="badge bg-primary me-1">Work-Life: {{ recommendation.info.work_life_balance }}/5</span>
+                                                    <span class="badge bg-info">Satisfaction: {{ recommendation.info.job_satisfaction }}/5</span>
+                                                </div>
+                                                <a href="{{ url_for('roadmap') }}?career={{ recommendation.title }}" class="btn btn-sm btn-primary">View Roadmap</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            
+                            <div class="text-center mt-3">
+                                <p class="mb-3">Not seeing a career that interests you?</p>
+                                <div class="d-flex justify-content-center gap-2">
+                                    <a href="{{ url_for('questionnaire') }}" class="btn btn-outline-primary">Retake Questionnaire</a>
+                                    <a href="{{ url_for('resume_analysis') }}" class="btn btn-outline-primary">Upload Different Resume</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card results-card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Next Steps</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-4 mb-3 mb-md-0">
+                                    <div class="card h-100">
+                                        <div class="card-body text-center">
+                                            <i class="fas fa-map-marked-alt fa-3x text-primary mb-3"></i>
+                                            <h5>Get a Detailed Roadmap</h5>
+                                            <p>Explore a step-by-step guide for any of your recommended careers.</p>
+                                            <a href="{{ url_for('roadmap') }}" class="btn btn-sm btn-primary">Create Roadmap</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-4 mb-3 mb-md-0">
+                                    <div class="card h-100">
+                                        <div class="card-body text-center">
+                                            <i class="fas fa-balance-scale fa-3x text-primary mb-3"></i>
+                                            <h5>Compare Two Careers</h5>
+                                            <p>Still can't decide? See a detailed comparison of any two options.</p>
+                                            <a href="{{ url_for('comparison') }}" class="btn btn-sm btn-primary">Compare Careers</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-4">
+                                    <div class="card h-100">
+                                        <div class="card-body text-center">
+                                            <i class="fas fa-file-alt fa-3x text-primary mb-3"></i>
+                                            <h5>Upload Your Resume</h5>
+                                            <p>Get even more personalized recommendations with resume analysis.</p>
+                                            <a href="{{ url_for('resume_analysis') }}" class="btn btn-sm btn-primary">Upload Resume</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+                
+                <!-- Action Buttons -->
+                <div class="d-flex justify-content-between mt-4">
+                    <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-home me-1"></i> Back to Home
+                    </a>
+                    
+                    {% if result_type == 'roadmap' %}
+                        <div>
+                            <a href="{{ url_for('comparison') }}" class="btn btn-primary me-2">
+                                <i class="fas fa-balance-scale me-1"></i> Compare With Another Career
+                            </a>
+                            <button class="btn btn-success" onclick="window.print()">
+                                <i class="fas fa-print me-1"></i> Print Roadmap
+                            </button>
+                        </div>
+                    {% elif result_type == 'comparison' %}
+                        <div>
+                            <a href="{{ url_for('roadmap') }}?career={{ results.career_one.title }}" class="btn btn-primary me-2">
+                                <i class="fas fa-map me-1"></i> Get {{ results.career_one.title | title }} Roadmap
+                            </a>
+                            <a href="{{ url_for('roadmap') }}?career={{ results.career_two.title }}" class="btn btn-primary">
+                                <i class="fas fa-map me-1"></i> Get {{ results.career_two.title | title }} Roadmap
+                            </a>
+                        </div>
+                    {% else %}
+                        <a href="{{ url_for('questionnaire') }}" class="btn btn-primary">
+                            <i class="fas fa-sync me-1"></i> Refine Recommendations
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<!-- Include Chart.js generator script -->
+<script src="{{ url_for('static', filename='js/chart_generator.js') }}"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        {% if result_type == 'roadmap' %}
+            // Generate roadmap chart
+            const careerData = {
+                milestones: JSON.parse('{{ results.relevant_milestones | tojson }}')
+            };
+            generateRoadmapChart('roadmapChart', careerData);
+            
+        {% elif result_type == 'comparison' %}
+            // Generate skills radar chart
+            const careerOne = {
+                title: '{{ results.career_one.title }}',
+                skills: JSON.parse('{{ results.career_one.info.skills_required | tojson }}')
+            };
+            
+            const careerTwo = {
+                title: '{{ results.career_two.title }}',
+                skills: JSON.parse('{{ results.career_two.info.skills_required | tojson }}')
+            };
+            
+            generateSkillsRadarChart('skillsChart', careerOne, careerTwo);
+        {% endif %}
+    });
+</script>
+{% endblock %}
