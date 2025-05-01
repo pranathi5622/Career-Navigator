@@ -21,30 +21,29 @@
                         <div class="d-flex mb-4 mt-4">
                             <div class="flex-shrink-0">
                                 <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
-                                    <i class="fas fa-file-alt text-white"></i>
+                                    <i class="fas fa-list-alt text-white"></i>
                                 </div>
                             </div>
                             <div class="ms-3">
-                                <h5>Step 1: Optional Resume Upload</h5>
-                                <p class="text-muted mb-0">Upload your resume so we can analyze your skills and experience. This step is optional but provides more accurate recommendations.</p>
+                                <h5>Step 1: Complete a Short Questionnaire</h5>
+                                <p class="text-muted mb-0">Answer questions about your interests, skills, values, and preferences to help us understand what matters most to you in a career.</p>
                             </div>
                         </div>
                         
                         <div class="d-flex mb-4">
                             <div class="flex-shrink-0">
                                 <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
-                                    <i class="fas fa-list-alt text-white"></i>
+                                    <i class="fas fa-file-alt text-white"></i>
                                 </div>
                             </div>
                             <div class="ms-3">
-                                <h5>Step 2: Complete a Short Questionnaire</h5>
-                                <p class="text-muted mb-0">Answer questions about your interests, skills, values, and preferences to help us understand what matters most to you in a career.</p>
+                                <h5>Step 2: Optional Resume Enhancement</h5>
+                                <p class="text-muted mb-0">During the questionnaire, you'll have the option to upload your resume to further refine our recommendations based on your current skills and experience.</p>
                             </div>
                         </div>
                         
-                        <div class="mt-4 d-grid gap-3">
-                            <a href="{{ url_for('upload_resume', path_type='recommendation') }}" class="btn btn-primary btn-lg">Start with Resume Upload</a>
-                            <a href="{{ url_for('questionnaire') }}" class="btn btn-outline-primary btn-lg">Skip to Questionnaire</a>
+                        <div class="mt-4 d-grid">
+                            <a href="{{ url_for('questionnaire') }}" class="btn btn-primary btn-lg">Start Questionnaire</a>
                         </div>
                     </div>
                 </div>
