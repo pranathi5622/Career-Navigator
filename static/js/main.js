@@ -28,28 +28,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }, false);
     });
 
-    // File input handling for resume upload
-    const resumeInput = document.getElementById('resume');
-    if (resumeInput) {
-        resumeInput.addEventListener('change', function() {
-            const fileLabel = document.querySelector('.custom-file-label');
-            if (fileLabel) {
-                fileLabel.textContent = this.files[0]?.name || 'Choose file';
-            }
-            
-            // Simple validation for file type
-            const fileType = this.files[0]?.type;
-            const validTypes = ['application/pdf'];
-            
-            if (this.files.length > 0 && !validTypes.includes(fileType)) {
-                alert('Please upload a PDF file');
-                this.value = '';
-                if (fileLabel) {
-                    fileLabel.textContent = 'Choose file';
-                }
-            }
-        });
-    }
+    // Career-related functionality only - resume upload removed
 
     // Career selection handling - update the form when a career is selected
     const careerSelect = document.getElementById('career');
