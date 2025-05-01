@@ -44,10 +44,11 @@ with app.app_context():
     db.create_all()
 
 # Import routes and forms
-from forms import CareerForm, ComparisonForm, QuestionnaireForm
+from forms import CareerForm, ComparisonForm, QuestionnaireForm, ResumeUploadForm
 from resume_parser import process_resume_file
 from recommendation_engine import get_career_recommendations, get_career_roadmap, compare_careers
 from career_data import get_career_details, get_all_careers
+from resume_optimizer import generate_optimization_suggestions
 
 # Route for home page
 @app.route('/')
@@ -135,9 +136,7 @@ def upload_resume(path_type):
             session['resume_skills'] = skills
             session['resume_education'] = education
             session['resume_experience'] = experience
-            
-            # Clean up file
-            os.remove(filepath)
+            session['resume_filepath'] = filepath  # Store filepath for optimization feature
             
             # Redirect based on path type
             if path_type == 'roadmap':
@@ -146,8 +145,57 @@ def upload_resume(path_type):
                 return redirect(url_for('comparison_result'))
             elif path_type == 'recommendation':
                 return redirect(url_for('questionnaire'))
+            elif path_type == 'optimize':
+                return redirect(url_for('optimize_resume'))
     
     return render_template('upload_resume.html', path_type=path_type)
+
+@app.route('/optimize_resume', methods=['GET', 'POST'])
+def optimize_resume():
+    """
+    Route for resume optimization feature
+    """
+    all_careers = get_all_careers()
+    form = CareerForm()
+    
+    if form.validate_on_submit():
+        target_career = form.career.data
+        
+        # Get resume filepath from session
+        resume_filepath = session.get('resume_filepath')
+        
+        if not resume_filepath or not os.path.exists(resume_filepath):
+            flash('Resume file not found. Please upload your resume again.', 'danger')
+            return redirect(url_for('upload_resume', path_type='optimize'))
+        
+        # Generate optimization suggestions
+        optimization_results = generate_optimization_suggestions(resume_filepath, target_career)
+        
+        # Store results in session
+        session['optimization_results'] = optimization_results
+        
+        # Clean up file after generating suggestions
+        if os.path.exists(resume_filepath):
+            os.remove(resume_filepath)
+            session.pop('resume_filepath', None)
+            
+        return redirect(url_for('optimization_results'))
+    
+    return render_template('optimize_resume.html', form=form, careers=all_careers)
+
+@app.route('/optimization_results')
+def optimization_results():
+    """
+    Route to display resume optimization results
+    """
+    # Get optimization results from session
+    results = session.get('optimization_results')
+    
+    if not results:
+        flash('No optimization results found. Please upload your resume and select a target career.', 'warning')
+        return redirect(url_for('upload_resume', path_type='optimize'))
+    
+    return render_template('optimization_results.html', results=results)
 
 # Routes for results
 @app.route('/roadmap_result')
