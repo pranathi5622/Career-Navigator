@@ -578,7 +578,8 @@
             // Roadmap chart
             const roadmapChartElement = document.getElementById('roadmapChart');
             if (roadmapChartElement) {
-                createRoadmapChart('roadmapChart', {{ roadmap.current_stage }});
+                const currentStage = parseInt(roadmapChartElement.getAttribute('data-current-stage') || 0);
+                createRoadmapChart('roadmapChart', currentStage);
             }
         {% elif result_type == 'comparison' %}
             // Comparison radar chart

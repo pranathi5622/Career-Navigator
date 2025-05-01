@@ -13,7 +13,7 @@ function createRoadmapChart(elementId, currentStage, stageLabels = ['Entry Level
     const ctx = canvas.getContext('2d');
     
     return new Chart(ctx, {
-        type: 'horizontalBar',
+        type: 'bar',
         data: {
             labels: stageLabels,
             datasets: [{
