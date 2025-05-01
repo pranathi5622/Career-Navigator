@@ -103,14 +103,20 @@ def comparison():
         session['career1'] = career1
         session['career2'] = career2
         
-        return redirect(url_for('upload_resume', path_type='comparison'))
+        # Set default empty values for skills and education
+        session['resume_skills'] = []
+        session['resume_education'] = ''
+        session['resume_experience'] = 0
+        
+        return redirect(url_for('comparison_result'))
     
     return render_template('comparison.html', form=form, careers=get_all_careers())
 
 # Routes for career recommendation system
 @app.route('/recommendation', methods=['GET', 'POST'])
 def recommendation():
-    return render_template('recommendation.html')
+    # Go directly to questionnaire
+    return redirect(url_for('questionnaire'))
 
 # Route for questionnaire
 @app.route('/questionnaire', methods=['GET', 'POST'])
@@ -129,46 +135,7 @@ def questionnaire():
     
     return render_template('questionnaire.html', form=form)
 
-# Route for resume upload
-@app.route('/upload_resume/<path_type>', methods=['GET', 'POST'])
-def upload_resume(path_type):
-    if request.method == 'POST':
-        # Check if the post request has the file part
-        if 'resume' not in request.files:
-            flash('No file part')
-            return redirect(request.url)
-            
-        file = request.files['resume']
-        
-        # If user does not select file, browser also
-        # submit an empty part without filename
-        if file.filename == '':
-            flash('No selected file')
-            return redirect(request.url)
-            
-        if file:
-            filename = secure_filename(file.filename)
-            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            file.save(filepath)
-            
-            # Process resume
-            skills, education, experience = process_resume_file(filepath)
-            
-            # Store resume data in session
-            session['resume_skills'] = skills
-            session['resume_education'] = education
-            session['resume_experience'] = experience
-            session['resume_filepath'] = filepath  # Store filepath for optimization feature
-            
-            # Redirect based on path type
-            if path_type == 'roadmap':
-                return redirect(url_for('roadmap_result'))
-            elif path_type == 'comparison':
-                return redirect(url_for('comparison_result'))
-            elif path_type == 'recommendation':
-                return redirect(url_for('questionnaire'))
-    
-    return render_template('upload_resume.html', path_type=path_type)
+
 
 
 
