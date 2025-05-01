@@ -1,0 +1,533 @@
+{% extends 'base.html' %}
+
+{% block title %}Career Mood Tracker - Career Compass{% endblock %}
+
+{% block additional_head %}
+<style>
+    .mood-entry-card {
+        transition: transform 0.2s;
+    }
+    .mood-entry-card:hover {
+        transform: translateY(-5px);
+    }
+    .emoji-large {
+        font-size: 2.5rem;
+        line-height: 1;
+    }
+    .rating-box {
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 6px;
+        font-weight: bold;
+        color: white;
+    }
+    .rating-1 { background-color: #dc3545; }
+    .rating-2 { background-color: #fd7e14; }
+    .rating-3 { background-color: #ffc107; }
+    .rating-4 { background-color: #20c997; }
+    .rating-5 { background-color: #198754; }
+    
+    .form-range::-webkit-slider-thumb {
+        background: #0d6efd;
+    }
+    .form-range::-webkit-slider-runnable-track {
+        background: #dee2e6;
+    }
+    .emoji-selector label {
+        cursor: pointer;
+        font-size: 1.8rem;
+        padding: 10px;
+        border-radius: 50%;
+        transition: all 0.2s;
+    }
+    .emoji-selector input[type="radio"] {
+        display: none;
+    }
+    .emoji-selector input[type="radio"]:checked + label {
+        background-color: #e9ecef;
+        transform: scale(1.1);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                <h1 class="mb-4">Career Mood Tracker</h1>
+                <p class="lead mb-5">Track your career satisfaction and emotional wellbeing over time to identify patterns and make informed decisions about your career path.</p>
+                
+                <!-- Mood Charts -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="mb-0">Your Career Mood Trends</h3>
+                    </div>
+                    <div class="card-body">
+                        <ul class="nav nav-tabs" id="moodChartTabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="satisfaction-tab" data-bs-toggle="tab" data-bs-target="#satisfaction-content" type="button" role="tab" aria-controls="satisfaction-content" aria-selected="true">Career Satisfaction</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="work-life-tab" data-bs-toggle="tab" data-bs-target="#work-life-content" type="button" role="tab" aria-controls="work-life-content" aria-selected="false">Work-Life Balance</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="stress-tab" data-bs-toggle="tab" data-bs-target="#stress-content" type="button" role="tab" aria-controls="stress-content" aria-selected="false">Stress Level</button>
+                            </li>
+                        </ul>
+                        <div class="tab-content p-3" id="moodChartTabsContent">
+                            <div class="tab-pane fade show active" id="satisfaction-content" role="tabpanel" aria-labelledby="satisfaction-tab">
+                                <div class="chart-container" style="position: relative; height:300px;">
+                                    <canvas id="careerSatisfactionChart"></canvas>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="work-life-content" role="tabpanel" aria-labelledby="work-life-tab">
+                                <div class="chart-container" style="position: relative; height:300px;">
+                                    <canvas id="workLifeBalanceChart"></canvas>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="stress-content" role="tabpanel" aria-labelledby="stress-tab">
+                                <div class="chart-container" style="position: relative; height:300px;">
+                                    <canvas id="stressLevelChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <h5>Mood Timeline</h5>
+                            <div class="chart-container" style="position: relative; height:100px;">
+                                <canvas id="moodTimelineChart"></canvas>
+                            </div>
+                            <div class="d-flex justify-content-between my-2">
+                                <div class="text-muted small">Past</div>
+                                <div class="text-muted small">Today</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Recent Entries -->
+                <div class="card shadow-sm">
+                    <div class="card-header">
+                        <h3 class="mb-0">Recent Check-ins</h3>
+                    </div>
+                    <div class="card-body p-0">
+                        {% if mood_entries %}
+                            <div class="list-group list-group-flush">
+                                {% for entry in mood_entries[:5] %}
+                                <div class="list-group-item">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <p class="mb-1">
+                                                <strong>{{ entry.entry_date.strftime('%b %d, %Y') }}</strong>
+                                                {% if entry.mood == 'very_happy' %}😁
+                                                {% elif entry.mood == 'happy' %}🙂
+                                                {% elif entry.mood == 'neutral' %}😐
+                                                {% elif entry.mood == 'unhappy' %}😔
+                                                {% elif entry.mood == 'very_unhappy' %}😢
+                                                {% endif %}
+                                            </p>
+                                            <div class="d-flex mb-2">
+                                                <div class="me-3">
+                                                    <small class="text-muted d-block">Satisfaction</small>
+                                                    <span class="rating-box rating-{{ entry.career_satisfaction }}">{{ entry.career_satisfaction }}</span>
+                                                </div>
+                                                <div class="me-3">
+                                                    <small class="text-muted d-block">Work-life</small>
+                                                    <span class="rating-box rating-{{ entry.work_life_balance }}">{{ entry.work_life_balance }}</span>
+                                                </div>
+                                                <div>
+                                                    <small class="text-muted d-block">Stress</small>
+                                                    <span class="rating-box rating-{{ 6 - entry.stress_level }}">{{ entry.stress_level }}</span>
+                                                </div>
+                                            </div>
+                                            {% if entry.notes %}
+                                            <p class="text-muted small mb-0">{{ entry.notes }}</p>
+                                            {% endif %}
+                                        </div>
+                                        <div>
+                                            <form action="{{ url_for('delete_mood_entry', entry_id=entry.id) }}" method="post" onsubmit="return confirm('Are you sure you want to delete this entry?');">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% if mood_entries|length > 5 %}
+                            <div class="text-center py-3">
+                                <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#allEntriesModal">
+                                    View All Entries
+                                </button>
+                            </div>
+                            {% endif %}
+                        {% else %}
+                            <div class="text-center py-5">
+                                <div class="mb-3">
+                                    <i class="fas fa-calendar-day fa-3x text-muted"></i>
+                                </div>
+                                <h5>No mood entries yet</h5>
+                                <p class="text-muted">Start tracking your career mood by adding your first check-in</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Check-in Form -->
+            <div class="col-lg-4 mt-4 mt-lg-0">
+                <div class="card shadow-sm sticky-top" style="top: 1.5rem;">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="mb-0">Today's Check-in</h3>
+                    </div>
+                    <div class="card-body">
+                        <form action="{{ url_for('mood_entry') }}" method="post">
+                            {{ form.csrf_token }}
+                            
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">{{ form.mood.label }}</label>
+                                <div class="emoji-selector d-flex justify-content-between">
+                                    {% for value, label in form.mood.choices %}
+                                    <div class="text-center">
+                                        <input type="radio" name="mood" id="mood_{{ value }}" value="{{ value }}" {% if loop.first %}checked{% endif %} />
+                                        <label for="mood_{{ value }}">{{ label.split(' ')[0] }}</label>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">{{ form.career_satisfaction.label }}</label>
+                                <div class="d-flex">
+                                    <input type="range" class="form-range" min="1" max="5" id="career_satisfaction" name="career_satisfaction" value="3" oninput="updateOutput(this.id, this.value)">
+                                    <span class="ms-2 rating-box rating-3" id="career_satisfaction_output">3</span>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <small class="text-muted">Low</small>
+                                    <small class="text-muted">High</small>
+                                </div>
+                                <div class="form-text">{{ form.career_satisfaction.description }}</div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">{{ form.work_life_balance.label }}</label>
+                                <div class="d-flex">
+                                    <input type="range" class="form-range" min="1" max="5" id="work_life_balance" name="work_life_balance" value="3" oninput="updateOutput(this.id, this.value)">
+                                    <span class="ms-2 rating-box rating-3" id="work_life_balance_output">3</span>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <small class="text-muted">Poor</small>
+                                    <small class="text-muted">Great</small>
+                                </div>
+                                <div class="form-text">{{ form.work_life_balance.description }}</div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label class="form-label">{{ form.stress_level.label }}</label>
+                                <div class="d-flex">
+                                    <input type="range" class="form-range" min="1" max="5" id="stress_level" name="stress_level" value="3" oninput="updateOutput(this.id, this.value)">
+                                    <span class="ms-2 rating-box rating-3" id="stress_level_output">3</span>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <small class="text-muted">Low</small>
+                                    <small class="text-muted">High</small>
+                                </div>
+                                <div class="form-text">{{ form.stress_level.description }}</div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label for="notes" class="form-label">{{ form.notes.label }}</label>
+                                {{ form.notes(class="form-control", id="notes", rows="3", placeholder="How are you feeling about your career today?") }}
+                                <div class="form-text">{{ form.notes.description }}</div>
+                            </div>
+                            
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary">Log My Mood</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- All Entries Modal -->
+{% if mood_entries|length > 5 %}
+<div class="modal fade" id="allEntriesModal" tabindex="-1" aria-labelledby="allEntriesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="allEntriesModalLabel">All Mood Entries</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="list-group list-group-flush">
+                    {% for entry in mood_entries %}
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <p class="mb-1">
+                                    <strong>{{ entry.entry_date.strftime('%b %d, %Y') }}</strong>
+                                    {% if entry.mood == 'very_happy' %}😁
+                                    {% elif entry.mood == 'happy' %}🙂
+                                    {% elif entry.mood == 'neutral' %}😐
+                                    {% elif entry.mood == 'unhappy' %}😔
+                                    {% elif entry.mood == 'very_unhappy' %}😢
+                                    {% endif %}
+                                </p>
+                                <div class="d-flex mb-2">
+                                    <div class="me-3">
+                                        <small class="text-muted d-block">Satisfaction</small>
+                                        <span class="rating-box rating-{{ entry.career_satisfaction }}">{{ entry.career_satisfaction }}</span>
+                                    </div>
+                                    <div class="me-3">
+                                        <small class="text-muted d-block">Work-life</small>
+                                        <span class="rating-box rating-{{ entry.work_life_balance }}">{{ entry.work_life_balance }}</span>
+                                    </div>
+                                    <div>
+                                        <small class="text-muted d-block">Stress</small>
+                                        <span class="rating-box rating-{{ 6 - entry.stress_level }}">{{ entry.stress_level }}</span>
+                                    </div>
+                                </div>
+                                {% if entry.notes %}
+                                <p class="text-muted small mb-0">{{ entry.notes }}</p>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <form action="{{ url_for('delete_mood_entry', entry_id=entry.id) }}" method="post" onsubmit="return confirm('Are you sure you want to delete this entry?');">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block additional_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    // Update rating value display
+    function updateOutput(inputId, value) {
+        document.getElementById(inputId + "_output").innerHTML = value;
+        document.getElementById(inputId + "_output").className = 'ms-2 rating-box rating-' + value;
+    }
+    
+    // Chart data from backend
+    const chartData = {{ chart_data|tojson }};
+    
+    // Convert emoji codes to emoji
+    const moodToEmoji = {
+        'very_happy': '😁',
+        'happy': '🙂',
+        'neutral': '😐',
+        'unhappy': '😔',
+        'very_unhappy': '😢'
+    };
+    
+    // Convert mood values to numerical values for charting
+    const moodToNumber = {
+        'very_happy': 5,
+        'happy': 4,
+        'neutral': 3,
+        'unhappy': 2,
+        'very_unhappy': 1
+    };
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        // Only create charts if there is data
+        if (chartData.dates && chartData.dates.length > 0) {
+            // Create Career Satisfaction Chart
+            const satisfactionCtx = document.getElementById('careerSatisfactionChart').getContext('2d');
+            new Chart(satisfactionCtx, {
+                type: 'line',
+                data: {
+                    labels: chartData.dates,
+                    datasets: [{
+                        label: 'Career Satisfaction',
+                        data: chartData.career_satisfaction,
+                        backgroundColor: 'rgba(13, 110, 253, 0.2)',
+                        borderColor: 'rgba(13, 110, 253, 1)',
+                        borderWidth: 2,
+                        tension: 0.2,
+                        fill: true
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            min: 1,
+                            max: 5,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Career Satisfaction Over Time'
+                        }
+                    },
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+            
+            // Create Work-Life Balance Chart
+            const workLifeCtx = document.getElementById('workLifeBalanceChart').getContext('2d');
+            new Chart(workLifeCtx, {
+                type: 'line',
+                data: {
+                    labels: chartData.dates,
+                    datasets: [{
+                        label: 'Work-Life Balance',
+                        data: chartData.work_life_balance,
+                        backgroundColor: 'rgba(32, 201, 151, 0.2)',
+                        borderColor: 'rgba(32, 201, 151, 1)',
+                        borderWidth: 2,
+                        tension: 0.2,
+                        fill: true
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            min: 1,
+                            max: 5,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Work-Life Balance Over Time'
+                        }
+                    },
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+            
+            // Create Stress Level Chart
+            const stressCtx = document.getElementById('stressLevelChart').getContext('2d');
+            new Chart(stressCtx, {
+                type: 'line',
+                data: {
+                    labels: chartData.dates,
+                    datasets: [{
+                        label: 'Stress Level',
+                        data: chartData.stress_levels,
+                        backgroundColor: 'rgba(220, 53, 69, 0.2)',
+                        borderColor: 'rgba(220, 53, 69, 1)',
+                        borderWidth: 2,
+                        tension: 0.2,
+                        fill: true
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            min: 1,
+                            max: 5,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Stress Level Over Time'
+                        }
+                    },
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+            
+            // Create Mood Timeline Chart
+            const moodValues = chartData.moods.map(mood => moodToNumber[mood]);
+            const moodTimelineCtx = document.getElementById('moodTimelineChart').getContext('2d');
+            new Chart(moodTimelineCtx, {
+                type: 'bar',
+                data: {
+                    labels: chartData.dates,
+                    datasets: [{
+                        label: 'Mood',
+                        data: moodValues,
+                        backgroundColor: function(context) {
+                            const index = context.dataIndex;
+                            const value = context.dataset.data[index];
+                            return value >= 4 ? 'rgba(25, 135, 84, 0.7)' : 
+                                   value >= 3 ? 'rgba(255, 193, 7, 0.7)' : 
+                                   'rgba(220, 53, 69, 0.7)';
+                        },
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            min: 1,
+                            max: 5,
+                            ticks: {
+                                display: false
+                            },
+                            grid: {
+                                display: false
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                display: false
+                            },
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const mood = chartData.moods[context.dataIndex];
+                                    return moodToEmoji[mood];
+                                }
+                            }
+                        }
+                    },
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}
