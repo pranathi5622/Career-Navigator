@@ -11,6 +11,7 @@ class User(UserMixin, db.Model):
     
     # Relationships
     user_profiles = db.relationship('UserProfile', backref='user', lazy=True)
+    mood_entries = db.relationship('MoodEntry', backref='user', lazy=True)
     
     def __repr__(self):
         return f'<User {self.username}>'
@@ -59,3 +60,17 @@ class CareerPath(db.Model):
     
     def __repr__(self):
         return f'<CareerPath {self.title}>'
+
+class MoodEntry(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    entry_date = db.Column(db.Date, nullable=False, default=datetime.utcnow().date)
+    mood = db.Column(db.String(20), nullable=False)  # 'very_happy', 'happy', 'neutral', 'unhappy', 'very_unhappy'
+    career_satisfaction = db.Column(db.Integer, nullable=False)  # 1-5
+    work_life_balance = db.Column(db.Integer, nullable=False)  # 1-5
+    stress_level = db.Column(db.Integer, nullable=False)  # 1-5
+    notes = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def __repr__(self):
+        return f'<MoodEntry {self.user_id} {self.entry_date}>'
