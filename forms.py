@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SelectField, TextAreaField, SelectMultipleField, FileField, IntegerField
+from wtforms import StringField, SelectField, TextAreaField, SelectMultipleField, IntegerField
 from wtforms.validators import DataRequired, Length, Email, NumberRange
 from career_data import get_all_careers
 
@@ -119,8 +119,5 @@ class QuestionnaireForm(FlaskForm):
                                              ('flexible', 'Flexible Schedule'),
                                              ('creative', 'Creative Environment')
                                          ])
-
-class ResumeUploadForm(FlaskForm):
-    resume = FileField('Upload Your Resume (PDF format)', validators=[DataRequired()])
 
 
