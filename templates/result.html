@@ -443,6 +443,22 @@
                                         <span class="badge bg-secondary me-1 mb-1">{{ related }}</span>
                                     {% endfor %}
                                 </div>
+                                
+                                <h5 class="mt-4">Recommended Courses</h5>
+                                <div class="recommended-courses mb-3">
+                                    {% if recommendation.details.resources %}
+                                        <ul class="list-group">
+                                            {% for resource in recommendation.details.resources %}
+                                                <li class="list-group-item d-flex align-items-center">
+                                                    <i class="fas fa-graduation-cap me-2 text-primary"></i>
+                                                    <span>{{ resource }}</span>
+                                                </li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% else %}
+                                        <p class="text-muted">No specific courses recommended for this career.</p>
+                                    {% endif %}
+                                </div>
                             </div>
                             <div class="card-footer">
                                 <a href="{{ url_for('roadmap') }}?preselect={{ recommendation.career|urlencode }}" class="btn btn-primary btn-sm">Create Career Roadmap</a>
