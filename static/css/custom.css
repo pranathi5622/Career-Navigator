@@ -1,0 +1,267 @@
+/* Career Guidance Web Application - Custom CSS */
+
+/* Use Bootstrap variables to maintain theme consistency */
+:root {
+    --primary-color: var(--bs-primary);
+    --secondary-color: var(--bs-secondary);
+    --success-color: var(--bs-success);
+    --info-color: var(--bs-info);
+    --warning-color: var(--bs-warning);
+    --danger-color: var(--bs-danger);
+    --light-color: var(--bs-light);
+    --dark-color: var(--bs-dark);
+}
+
+/* Hero section styles */
+.hero-section {
+    padding: 5rem 0;
+    background: linear-gradient(135deg, var(--bs-primary) 0%, var(--bs-info) 100%);
+    color: white;
+    text-align: center;
+}
+
+.hero-section h1 {
+    font-size: 3.5rem;
+    margin-bottom: 2rem;
+}
+
+.hero-section p {
+    font-size: 1.25rem;
+    max-width: 800px;
+    margin: 0 auto 2rem auto;
+}
+
+/* Path cards */
+.path-card {
+    height: 100%;
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.path-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.path-card-icon {
+    font-size: 3rem;
+    margin-bottom: 1.5rem;
+    color: var(--bs-primary);
+}
+
+/* Form and input styling */
+.form-section {
+    background-color: var(--bs-light);
+    border-radius: 8px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.custom-file-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Multi-step form */
+.form-step {
+    display: none;
+}
+
+.form-step.active {
+    display: block;
+}
+
+.form-progress {
+    margin-bottom: 2rem;
+}
+
+/* Roadmap display */
+.roadmap-timeline {
+    position: relative;
+    padding-left: 50px;
+}
+
+.roadmap-timeline::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 20px;
+    width: 4px;
+    background-color: var(--bs-primary);
+}
+
+.roadmap-item {
+    position: relative;
+    padding-bottom: 2rem;
+}
+
+.roadmap-item::before {
+    content: '';
+    position: absolute;
+    left: -34px;
+    top: 6px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: var(--bs-light);
+    border: 4px solid var(--bs-primary);
+}
+
+.roadmap-item.active::before {
+    background-color: var(--bs-primary);
+}
+
+.roadmap-item h3 {
+    margin-bottom: 0.5rem;
+}
+
+/* Comparison section */
+.comparison-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+}
+
+.comparison-col {
+    flex: 1;
+    min-width: 300px;
+}
+
+.comparison-card {
+    height: 100%;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border: none;
+    border-radius: 8px;
+}
+
+.comparison-header {
+    background-color: var(--bs-primary);
+    color: white;
+    padding: 1rem;
+    border-radius: 8px 8px 0 0;
+}
+
+.comparison-table th {
+    background-color: var(--bs-light);
+}
+
+/* Recommendation results */
+.recommendation-card {
+    margin-bottom: 1.5rem;
+    transition: transform 0.3s ease;
+}
+
+.recommendation-card:hover {
+    transform: translateY(-5px);
+}
+
+.match-score {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--bs-primary);
+}
+
+.skill-tag {
+    display: inline-block;
+    background-color: var(--bs-light);
+    color: var(--bs-dark);
+    padding: 0.25rem 0.75rem;
+    border-radius: 50px;
+    margin-right: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.skill-tag.matched {
+    background-color: var(--bs-success);
+    color: white;
+}
+
+.skill-tag.missing {
+    background-color: var(--bs-secondary);
+}
+
+/* Resource links */
+.resource-link {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.5rem;
+    background-color: var(--bs-light);
+    border-radius: 4px;
+    transition: transform 0.2s ease;
+    text-decoration: none;
+    color: var(--bs-dark);
+}
+
+.resource-link:hover {
+    transform: translateX(5px);
+    background-color: var(--bs-primary);
+    color: white;
+}
+
+.resource-link i {
+    margin-right: 0.75rem;
+}
+
+/* Responsive chart container */
+.chart-container {
+    position: relative;
+    height: 300px;
+    margin-bottom: 2rem;
+}
+
+/* Accessibility improvements */
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Media queries for responsive design */
+@media (max-width: 991.98px) {
+    .hero-section h1 {
+        font-size: 2.5rem;
+    }
+    
+    .path-card {
+        margin-bottom: 1.5rem;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .hero-section {
+        padding: 3rem 0;
+    }
+    
+    .hero-section h1 {
+        font-size: 2rem;
+    }
+    
+    .form-section {
+        padding: 1.5rem;
+    }
+    
+    .roadmap-timeline {
+        padding-left: 30px;
+    }
+    
+    .roadmap-timeline::before {
+        left: 12px;
+    }
+    
+    .roadmap-item::before {
+        left: -24px;
+        width: 16px;
+        height: 16px;
+    }
+}

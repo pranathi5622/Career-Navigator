@@ -1,0 +1,223 @@
+import os
+import logging
+from flask import Flask, render_template, redirect, url_for, flash, request, session
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.orm import DeclarativeBase
+from werkzeug.middleware.proxy_fix import ProxyFix
+from werkzeug.utils import secure_filename
+import tempfile
+import os.path
+
+# Set up logging
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+
+# Create SQLAlchemy Base
+class Base(DeclarativeBase):
+    pass
+
+# Initialize SQLAlchemy
+db = SQLAlchemy(model_class=Base)
+
+# Create Flask app
+app = Flask(__name__)
+app.secret_key = os.environ.get("SESSION_SECRET", "dev_secret_key")
+app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
+
+# Configure SQLite database
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", "sqlite:///career_guidance.db")
+app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+    "pool_recycle": 300,
+    "pool_pre_ping": True,
+}
+app.config["UPLOAD_FOLDER"] = tempfile.gettempdir()
+app.config["MAX_CONTENT_LENGTH"] = 16 * 1024 * 1024  # 16MB max upload
+
+# Initialize the app with the extension
+db.init_app(app)
+
+with app.app_context():
+    # Import models
+    import models  # noqa: F401
+    
+    # Create tables
+    db.create_all()
+
+# Import routes and forms
+from forms import CareerForm, ComparisonForm, QuestionnaireForm
+from resume_parser import process_resume_file
+from recommendation_engine import get_career_recommendations, get_career_roadmap, compare_careers
+from career_data import get_career_details, get_all_careers
+
+# Route for home page
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+# Routes for career roadmap generator
+@app.route('/roadmap', methods=['GET', 'POST'])
+def roadmap():
+    form = CareerForm()
+    
+    if form.validate_on_submit():
+        career = form.career.data
+        experience_level = form.experience_level.data
+        session['selected_career'] = career
+        session['experience_level'] = experience_level
+        
+        return redirect(url_for('upload_resume', path_type='roadmap'))
+    
+    return render_template('roadmap.html', form=form, careers=get_all_careers())
+
+# Routes for career comparison tool
+@app.route('/comparison', methods=['GET', 'POST'])
+def comparison():
+    form = ComparisonForm()
+    
+    if form.validate_on_submit():
+        career1 = form.career1.data
+        career2 = form.career2.data
+        session['career1'] = career1
+        session['career2'] = career2
+        
+        return redirect(url_for('upload_resume', path_type='comparison'))
+    
+    return render_template('comparison.html', form=form, careers=get_all_careers())
+
+# Routes for career recommendation system
+@app.route('/recommendation', methods=['GET', 'POST'])
+def recommendation():
+    return render_template('recommendation.html')
+
+# Route for questionnaire
+@app.route('/questionnaire', methods=['GET', 'POST'])
+def questionnaire():
+    form = QuestionnaireForm()
+    
+    if form.validate_on_submit():
+        session['interests'] = form.interests.data
+        session['skills'] = form.skills.data
+        session['values'] = form.values.data
+        session['personality'] = form.personality.data
+        session['education'] = form.education.data
+        session['work_environment'] = form.work_environment.data
+        
+        return redirect(url_for('recommendation_result'))
+    
+    return render_template('questionnaire.html', form=form)
+
+# Route for resume upload
+@app.route('/upload_resume/<path_type>', methods=['GET', 'POST'])
+def upload_resume(path_type):
+    if request.method == 'POST':
+        # Check if the post request has the file part
+        if 'resume' not in request.files:
+            flash('No file part')
+            return redirect(request.url)
+            
+        file = request.files['resume']
+        
+        # If user does not select file, browser also
+        # submit an empty part without filename
+        if file.filename == '':
+            flash('No selected file')
+            return redirect(request.url)
+            
+        if file:
+            filename = secure_filename(file.filename)
+            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            file.save(filepath)
+            
+            # Process resume
+            skills, education, experience = process_resume_file(filepath)
+            
+            # Store resume data in session
+            session['resume_skills'] = skills
+            session['resume_education'] = education
+            session['resume_experience'] = experience
+            
+            # Clean up file
+            os.remove(filepath)
+            
+            # Redirect based on path type
+            if path_type == 'roadmap':
+                return redirect(url_for('roadmap_result'))
+            elif path_type == 'comparison':
+                return redirect(url_for('comparison_result'))
+            elif path_type == 'recommendation':
+                return redirect(url_for('questionnaire'))
+    
+    return render_template('upload_resume.html', path_type=path_type)
+
+# Routes for results
+@app.route('/roadmap_result')
+def roadmap_result():
+    # Get data from session
+    career = session.get('selected_career')
+    experience_level = session.get('experience_level')
+    skills = session.get('resume_skills', [])
+    education = session.get('resume_education', [])
+    experience = session.get('resume_experience', 0)
+    
+    # Get career roadmap
+    career_details = get_career_details(career)
+    roadmap = get_career_roadmap(career, experience_level, skills, education, experience)
+    
+    return render_template('result.html', 
+                          result_type='roadmap',
+                          career=career,
+                          career_details=career_details,
+                          roadmap=roadmap)
+
+@app.route('/comparison_result')
+def comparison_result():
+    # Get data from session
+    career1 = session.get('career1')
+    career2 = session.get('career2')
+    skills = session.get('resume_skills', [])
+    education = session.get('resume_education', [])
+    experience = session.get('resume_experience', 0)
+    
+    # Get career comparisons
+    career1_details = get_career_details(career1)
+    career2_details = get_career_details(career2)
+    comparison = compare_careers(career1, career2, skills, education, experience)
+    
+    return render_template('result.html',
+                          result_type='comparison',
+                          career1=career1,
+                          career2=career2,
+                          career1_details=career1_details,
+                          career2_details=career2_details,
+                          comparison=comparison)
+
+@app.route('/recommendation_result')
+def recommendation_result():
+    # Get questionnaire data from session
+    interests = session.get('interests', [])
+    skills = session.get('skills', [])
+    values = session.get('values', [])
+    personality = session.get('personality', '')
+    education = session.get('education', '')
+    work_environment = session.get('work_environment', [])
+    
+    # Get resume data from session if it exists
+    resume_skills = session.get('resume_skills', [])
+    resume_education = session.get('resume_education', [])
+    
+    # Combine resume and questionnaire data
+    if resume_skills:
+        skills = list(set(skills + resume_skills))
+    
+    # Get recommendations
+    recommendations = get_career_recommendations(
+        interests, skills, values, personality, 
+        education or resume_education, work_environment
+    )
+    
+    return render_template('result.html',
+                          result_type='recommendation',
+                          recommendations=recommendations)
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000, debug=True)

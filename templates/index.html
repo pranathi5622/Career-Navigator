@@ -1,0 +1,219 @@
+{% extends 'base.html' %}
+
+{% block title %}Career Compass - Your Career Guidance Tool{% endblock %}
+
+{% block content %}
+<!-- Hero section -->
+<section class="hero-section">
+    <div class="container">
+        <h1>Discover Your Ideal Career Path</h1>
+        <p>Whether you know your career path, are comparing options, or need guidance to find the right fit, Career Compass will help you navigate your professional journey.</p>
+        <div class="d-flex justify-content-center">
+            <a href="#career-paths" class="btn btn-light btn-lg px-4 me-3">Explore Paths</a>
+            <a href="{{ url_for('recommendation') }}" class="btn btn-outline-light btn-lg px-4">Get Recommendations</a>
+        </div>
+    </div>
+</section>
+
+<!-- Career paths section -->
+<section class="py-5" id="career-paths">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="display-5 fw-bold">Choose Your Path</h2>
+            <p class="lead">Select the option that best matches your current career planning situation</p>
+        </div>
+        
+        <div class="row g-4">
+            <!-- Path 1: Career Roadmap Generator -->
+            <div class="col-md-4">
+                <div class="card path-card">
+                    <div class="card-body text-center p-4">
+                        <div class="path-card-icon">
+                            <i class="fas fa-map-signs"></i>
+                        </div>
+                        <h3 class="card-title">Career Roadmap</h3>
+                        <p class="card-text">Know your career path but need guidance on how to get there? Get a personalized roadmap with milestones and resources.</p>
+                        <div class="card-text text-muted mb-4">
+                            <small>Best for those who:</small>
+                            <ul class="text-start ps-3 mt-2">
+                                <li>Have a specific career in mind</li>
+                                <li>Need guidance on progression</li>
+                                <li>Want to advance in their current field</li>
+                            </ul>
+                        </div>
+                        <a href="{{ url_for('roadmap') }}" class="btn btn-primary">Create Roadmap</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Path 2: Career Comparison Tool -->
+            <div class="col-md-4">
+                <div class="card path-card">
+                    <div class="card-body text-center p-4">
+                        <div class="path-card-icon">
+                            <i class="fas fa-balance-scale"></i>
+                        </div>
+                        <h3 class="card-title">Career Comparison</h3>
+                        <p class="card-text">Deciding between multiple career options? Compare various aspects like salary, growth potential, and required skills.</p>
+                        <div class="card-text text-muted mb-4">
+                            <small>Best for those who:</small>
+                            <ul class="text-start ps-3 mt-2">
+                                <li>Are considering multiple options</li>
+                                <li>Want to compare career benefits</li>
+                                <li>Need to evaluate career transitions</li>
+                            </ul>
+                        </div>
+                        <a href="{{ url_for('comparison') }}" class="btn btn-primary">Compare Careers</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Path 3: Career Recommendation System -->
+            <div class="col-md-4">
+                <div class="card path-card">
+                    <div class="card-body text-center p-4">
+                        <div class="path-card-icon">
+                            <i class="fas fa-lightbulb"></i>
+                        </div>
+                        <h3 class="card-title">Career Recommendation</h3>
+                        <p class="card-text">Not sure which career suits you best? Answer a questionnaire to receive personalized career recommendations.</p>
+                        <div class="card-text text-muted mb-4">
+                            <small>Best for those who:</small>
+                            <ul class="text-start ps-3 mt-2">
+                                <li>Are undecided about career path</li>
+                                <li>Want to explore career options</li>
+                                <li>Need guidance based on skills and interests</li>
+                            </ul>
+                        </div>
+                        <a href="{{ url_for('recommendation') }}" class="btn btn-primary">Get Recommendations</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How it works section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="display-5 fw-bold">How It Works</h2>
+            <p class="lead">Our intuitive process helps you make informed career decisions</p>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-3">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mx-auto mb-4" style="width: 70px; height: 70px;">
+                            <h3 class="mb-0">1</h3>
+                        </div>
+                        <h4>Choose Your Path</h4>
+                        <p class="text-muted">Select the approach that best fits your current career planning needs.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mx-auto mb-4" style="width: 70px; height: 70px;">
+                            <h3 class="mb-0">2</h3>
+                        </div>
+                        <h4>Share Information</h4>
+                        <p class="text-muted">Upload your resume or answer questions about your skills, interests, and preferences.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mx-auto mb-4" style="width: 70px; height: 70px;">
+                            <h3 class="mb-0">3</h3>
+                        </div>
+                        <h4>Get Personalized Results</h4>
+                        <p class="text-muted">Receive customized roadmaps, comparisons, or recommendations based on your input.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mx-auto mb-4" style="width: 70px; height: 70px;">
+                            <h3 class="mb-0">4</h3>
+                        </div>
+                        <h4>Take Action</h4>
+                        <p class="text-muted">Use the insights and resources to make informed decisions about your career journey.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 mb-4 mb-lg-0">
+                <h2 class="fw-bold mb-4">Features That Guide Your Career Journey</h2>
+                
+                <div class="d-flex mb-4">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-file-alt text-primary fa-2x"></i>
+                    </div>
+                    <div class="ms-3">
+                        <h5>Resume Analysis</h5>
+                        <p class="text-muted">Upload your resume to get personalized career insights based on your skills and experience.</p>
+                    </div>
+                </div>
+                
+                <div class="d-flex mb-4">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-chart-line text-primary fa-2x"></i>
+                    </div>
+                    <div class="ms-3">
+                        <h5>Visual Career Roadmaps</h5>
+                        <p class="text-muted">See your career path visualized with clear milestones and steps to achieve your goals.</p>
+                    </div>
+                </div>
+                
+                <div class="d-flex mb-4">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-search text-primary fa-2x"></i>
+                    </div>
+                    <div class="ms-3">
+                        <h5>In-depth Comparisons</h5>
+                        <p class="text-muted">Compare careers across multiple dimensions to make informed decisions about your future.</p>
+                    </div>
+                </div>
+                
+                <div class="d-flex">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-graduation-cap text-primary fa-2x"></i>
+                    </div>
+                    <div class="ms-3">
+                        <h5>Learning Resources</h5>
+                        <p class="text-muted">Get recommended learning resources tailored to help you develop the skills you need.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-6">
+                <div class="card bg-primary text-white">
+                    <div class="card-body p-5">
+                        <h3 class="card-title mb-4">Ready to start your career journey?</h3>
+                        <p class="card-text mb-4">Take the first step toward a more informed career path with our personalized guidance tools.</p>
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+                            <a href="{{ url_for('roadmap') }}" class="btn btn-light btn-lg px-4 me-md-2">Create Roadmap</a>
+                            <a href="{{ url_for('recommendation') }}" class="btn btn-outline-light btn-lg px-4">Get Recommendations</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

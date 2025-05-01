@@ -1,0 +1,229 @@
+{% extends 'base.html' %}
+
+{% block title %}Career Questionnaire - Career Compass{% endblock %}
+
+{% block content %}
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h1 class="display-5 fw-bold">Career Preference Questionnaire</h1>
+            <p class="lead">Tell us about your interests, skills, and preferences to get personalized career recommendations</p>
+        </div>
+        
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card shadow-sm">
+                    <div class="card-body p-4">
+                        <div class="progress form-progress mb-4">
+                            <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                        
+                        <form action="{{ url_for('questionnaire') }}" method="post" class="needs-validation multi-step-form" novalidate>
+                            {{ form.csrf_token }}
+                            
+                            <!-- Step 1: Interests -->
+                            <div class="form-step">
+                                <h3 class="card-title mb-4">Step 1: Your Interests</h3>
+                                <p class="text-muted mb-4">Select the areas that you find most interesting or enjoyable.</p>
+                                
+                                <div class="mb-4">
+                                    <label class="form-label">What are your main interests? (Select all that apply)</label>
+                                    
+                                    <div class="row g-3">
+                                        {% for value, label in form.interests.choices %}
+                                        <div class="col-md-6">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="interest_{{ value }}" name="interests" value="{{ value }}" required>
+                                                <label class="form-check-label" for="interest_{{ value }}">{{ label }}</label>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                    
+                                    <div class="invalid-feedback">Please select at least one interest area.</div>
+                                </div>
+                                
+                                <div class="d-flex justify-content-end">
+                                    <button type="button" class="btn btn-primary btn-next">Continue to Skills <i class="fas fa-arrow-right ms-2"></i></button>
+                                </div>
+                            </div>
+                            
+                            <!-- Step 2: Skills -->
+                            <div class="form-step">
+                                <h3 class="card-title mb-4">Step 2: Your Skills</h3>
+                                <p class="text-muted mb-4">Select the skills that you possess or enjoy using.</p>
+                                
+                                <div class="mb-4">
+                                    <label class="form-label">What skills do you have or enjoy using? (Select all that apply)</label>
+                                    
+                                    <div class="row g-3">
+                                        {% for value, label in form.skills.choices %}
+                                        <div class="col-md-6">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="skill_{{ value }}" name="skills" value="{{ value }}" required>
+                                                <label class="form-check-label" for="skill_{{ value }}">{{ label }}</label>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                    
+                                    <div class="invalid-feedback">Please select at least one skill.</div>
+                                </div>
+                                
+                                <div class="d-flex justify-content-between">
+                                    <button type="button" class="btn btn-outline-secondary btn-prev"><i class="fas fa-arrow-left me-2"></i> Back</button>
+                                    <button type="button" class="btn btn-primary btn-next">Continue to Values <i class="fas fa-arrow-right ms-2"></i></button>
+                                </div>
+                            </div>
+                            
+                            <!-- Step 3: Values -->
+                            <div class="form-step">
+                                <h3 class="card-title mb-4">Step 3: Your Values</h3>
+                                <p class="text-muted mb-4">Select what matters most to you in a career.</p>
+                                
+                                <div class="mb-4">
+                                    <label class="form-label">What values are most important to you in a career? (Select all that apply)</label>
+                                    
+                                    <div class="row g-3">
+                                        {% for value, label in form.values.choices %}
+                                        <div class="col-md-6">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="value_{{ value }}" name="values" value="{{ value }}" required>
+                                                <label class="form-check-label" for="value_{{ value }}">{{ label }}</label>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                    
+                                    <div class="invalid-feedback">Please select at least one value.</div>
+                                </div>
+                                
+                                <div class="d-flex justify-content-between">
+                                    <button type="button" class="btn btn-outline-secondary btn-prev"><i class="fas fa-arrow-left me-2"></i> Back</button>
+                                    <button type="button" class="btn btn-primary btn-next">Continue to Personality <i class="fas fa-arrow-right ms-2"></i></button>
+                                </div>
+                            </div>
+                            
+                            <!-- Step 4: Personality -->
+                            <div class="form-step">
+                                <h3 class="card-title mb-4">Step 4: Your Work Personality</h3>
+                                <p class="text-muted mb-4">Select the personality type that best describes you at work.</p>
+                                
+                                <div class="mb-4">
+                                    <label class="form-label">How would you describe your work personality?</label>
+                                    
+                                    <div class="row g-3">
+                                        {% for value, label in form.personality.choices %}
+                                        <div class="col-12">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" id="personality_{{ value }}" name="personality" value="{{ value }}" required>
+                                                <label class="form-check-label" for="personality_{{ value }}">{{ label }}</label>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                    
+                                    <div class="invalid-feedback">Please select a personality type.</div>
+                                </div>
+                                
+                                <div class="d-flex justify-content-between">
+                                    <button type="button" class="btn btn-outline-secondary btn-prev"><i class="fas fa-arrow-left me-2"></i> Back</button>
+                                    <button type="button" class="btn btn-primary btn-next">Continue to Education <i class="fas fa-arrow-right ms-2"></i></button>
+                                </div>
+                            </div>
+                            
+                            <!-- Step 5: Education -->
+                            <div class="form-step">
+                                <h3 class="card-title mb-4">Step 5: Your Education</h3>
+                                <p class="text-muted mb-4">Select your current or planned education level.</p>
+                                
+                                <div class="mb-4">
+                                    <label class="form-label">What is your current or planned education level?</label>
+                                    
+                                    <div class="row g-3">
+                                        {% for value, label in form.education.choices %}
+                                        <div class="col-12">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" id="education_{{ value }}" name="education" value="{{ value }}" required>
+                                                <label class="form-check-label" for="education_{{ value }}">{{ label }}</label>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                    
+                                    <div class="invalid-feedback">Please select an education level.</div>
+                                </div>
+                                
+                                <div class="d-flex justify-content-between">
+                                    <button type="button" class="btn btn-outline-secondary btn-prev"><i class="fas fa-arrow-left me-2"></i> Back</button>
+                                    <button type="button" class="btn btn-primary btn-next">Continue to Work Environment <i class="fas fa-arrow-right ms-2"></i></button>
+                                </div>
+                            </div>
+                            
+                            <!-- Step 6: Work Environment -->
+                            <div class="form-step">
+                                <h3 class="card-title mb-4">Step 6: Your Preferred Work Environment</h3>
+                                <p class="text-muted mb-4">Select the type of work environments you prefer.</p>
+                                
+                                <div class="mb-4">
+                                    <label class="form-label">What type of work environment do you prefer? (Select all that apply)</label>
+                                    
+                                    <div class="row g-3">
+                                        {% for value, label in form.work_environment.choices %}
+                                        <div class="col-md-6">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="env_{{ value }}" name="work_environment" value="{{ value }}" required>
+                                                <label class="form-check-label" for="env_{{ value }}">{{ label }}</label>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                    
+                                    <div class="invalid-feedback">Please select at least one work environment.</div>
+                                </div>
+                                
+                                <div class="d-flex justify-content-between">
+                                    <button type="button" class="btn btn-outline-secondary btn-prev"><i class="fas fa-arrow-left me-2"></i> Back</button>
+                                    <button type="submit" class="btn btn-success">Get Recommendations</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <div class="card mt-4 shadow-sm">
+                    <div class="card-body p-4">
+                        <h4 class="mb-3">Why these questions matter</h4>
+                        <p class="text-muted">Your answers help us identify careers that align with your preferences, skills, and goals. The more accurately you answer, the better recommendations we can provide.</p>
+                        
+                        <p class="small mt-3 mb-0">Your responses are used only to generate recommendations and are not shared with any third parties.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block additional_scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Ensure at least one checkbox is selected for checkbox groups
+        const checkboxGroups = document.querySelectorAll('.form-step');
+        
+        checkboxGroups.forEach(group => {
+            const checkboxes = group.querySelectorAll('input[type="checkbox"]');
+            if (checkboxes.length > 0) {
+                checkboxes.forEach(checkbox => {
+                    checkbox.addEventListener('change', function() {
+                        const checkedBoxes = Array.from(checkboxes).filter(cb => cb.checked);
+                        checkboxes.forEach(cb => {
+                            cb.required = checkedBoxes.length === 0;
+                        });
+                    });
+                });
+            }
+        });
+    });
+</script>
+{% endblock %}

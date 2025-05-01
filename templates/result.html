@@ -1,0 +1,584 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {% if result_type == 'roadmap' %}
+        Career Roadmap - {{ career }}
+    {% elif result_type == 'comparison' %}
+        Career Comparison - {{ career1 }} vs {{ career2 }}
+    {% else %}
+        Career Recommendations
+    {% endif %}
+     - Career Compass
+{% endblock %}
+
+{% block content %}
+<!-- Header section based on result type -->
+<section class="py-5 bg-primary text-white">
+    <div class="container">
+        <div class="text-center">
+            {% if result_type == 'roadmap' %}
+                <h1 class="display-5 fw-bold">Your Career Roadmap</h1>
+                <p class="lead">Personalized roadmap for your journey in {{ career }}</p>
+            {% elif result_type == 'comparison' %}
+                <h1 class="display-5 fw-bold">Career Comparison Results</h1>
+                <p class="lead">Comparing {{ career1 }} vs {{ career2 }}</p>
+            {% else %}
+                <h1 class="display-5 fw-bold">Your Career Recommendations</h1>
+                <p class="lead">Careers that match your skills, interests, and preferences</p>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- Results section -->
+<section class="py-5">
+    <div class="container">
+        {% if result_type == 'roadmap' %}
+            <!-- ROADMAP RESULTS -->
+            <div class="row">
+                <!-- Career Overview -->
+                <div class="col-lg-4 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-header bg-secondary text-white">
+                            <h3 class="mb-0">{{ career }}</h3>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Description:</strong> {{ career_details.description }}</p>
+                            <p><strong>Salary Range:</strong> {{ career_details.salary_range }}</p>
+                            <p><strong>Job Outlook:</strong> {{ career_details.job_outlook }}</p>
+                            <p><strong>Required Education:</strong> {{ career_details.required_education }}</p>
+                            
+                            <h5 class="mt-4">Required Skills</h5>
+                            <div class="mb-3">
+                                {% for skill in career_details.required_skills %}
+                                    <span class="badge bg-secondary me-1 mb-1">{{ skill }}</span>
+                                {% endfor %}
+                            </div>
+                            
+                            <h5 class="mt-4">Work Environment</h5>
+                            <p>{{ career_details.work_environment }}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Career Roadmap -->
+                <div class="col-lg-8">
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-header">
+                            <h3 class="mb-0">Your Career Progression</h3>
+                        </div>
+                        <div class="card-body">
+                            <!-- Roadmap chart -->
+                            <div class="chart-container mb-4">
+                                <canvas id="roadmapChart" data-current-stage="{{ roadmap.current_stage }}"></canvas>
+                            </div>
+                            
+                            <!-- Roadmap timeline -->
+                            <div class="roadmap-timeline">
+                                {% for stage in roadmap.stages %}
+                                    <div class="roadmap-item {% if loop.index0 == roadmap.current_stage %}active{% endif %}">
+                                        <h4>{{ stage.title }}</h4>
+                                        <p>{{ stage.description }}</p>
+                                        
+                                        <div class="card mb-3">
+                                            <div class="card-body">
+                                                <h5 class="card-title">Typical Roles</h5>
+                                                <ul class="mb-0">
+                                                    {% for role in stage.typical_roles %}
+                                                        <li>{{ role }}</li>
+                                                    {% endfor %}
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="card mb-3">
+                                            <div class="card-body">
+                                                <h5 class="card-title">Skills to Develop</h5>
+                                                <div>
+                                                    {% for skill in stage.skills_to_develop %}
+                                                        <span class="badge bg-info me-1 mb-1">{{ skill }}</span>
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="card mb-3">
+                                            <div class="card-body">
+                                                <h5 class="card-title">Education & Certification</h5>
+                                                <p class="mb-0">{{ stage.education_requirements }}</p>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="text-muted small">
+                                            <i class="fas fa-clock me-1"></i> Typical Time: {{ stage.time_estimate }}
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Skill gaps and resources -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card shadow-sm h-100">
+                                <div class="card-header">
+                                    <h4 class="mb-0">Skill Gaps to Address</h4>
+                                </div>
+                                <div class="card-body">
+                                    {% if roadmap.skill_gaps %}
+                                        <ul class="mb-0">
+                                            {% for skill in roadmap.skill_gaps %}
+                                                <li>{{ skill }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% else %}
+                                        <p class="text-muted mb-0">Great job! You have most of the required skills for your current level.</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="card shadow-sm h-100">
+                                <div class="card-header">
+                                    <h4 class="mb-0">Recommended Resources</h4>
+                                </div>
+                                <div class="card-body">
+                                    <ul class="list-unstyled mb-0">
+                                        {% for resource in roadmap.recommended_resources %}
+                                            <li class="mb-2">
+                                                <a href="#" class="resource-link">
+                                                    <i class="fas fa-external-link-alt"></i>
+                                                    {{ resource }}
+                                                </a>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        {% elif result_type == 'comparison' %}
+            <!-- COMPARISON RESULTS -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card shadow-sm">
+                        <div class="card-header">
+                            <h3 class="mb-0">Career Comparison Overview</h3>
+                        </div>
+                        <div class="card-body">
+                            <!-- Comparison radar chart -->
+                            <div class="chart-container mb-4">
+                                <canvas id="comparisonChart" 
+                                        data-career1="{{ career1 }}" 
+                                        data-career2="{{ career2 }}"
+                                        data-skill-match1="{{ comparison.overview.career1.skill_match }}"
+                                        data-skill-match2="{{ comparison.overview.career2.skill_match }}"
+                                        data-edu-fit1="{{ 75 if comparison.education.career1.level_index >= 2 else 50 }}"
+                                        data-edu-fit2="{{ 75 if comparison.education.career2.level_index >= 2 else 50 }}"
+                                        data-salary1="{{ 80 if '$100,000' in comparison.compensation.career1 else 50 }}"
+                                        data-salary2="{{ 80 if '$100,000' in comparison.compensation.career2 else 50 }}"
+                                        data-growth1="{{ 80 if 'faster' in comparison.outlook.career1 else 50 }}"
+                                        data-growth2="{{ 80 if 'faster' in comparison.outlook.career2 else 50 }}"
+                                        data-balance1="60"
+                                        data-balance2="60">
+                                </canvas>
+                            </div>
+                            
+                            <div class="alert alert-info">
+                                <div class="d-flex">
+                                    <div class="flex-shrink-0">
+                                        <i class="fas fa-info-circle fa-lg mt-1"></i>
+                                    </div>
+                                    <div class="ms-3">
+                                        <h5 class="alert-heading">Transition Difficulty</h5>
+                                        <p class="mb-0"><strong>{{ comparison.transition_difficulty.level }}:</strong> {{ comparison.transition_difficulty.description }}</p>
+                                        {% if comparison.transition_difficulty.experience_factor %}
+                                            <p class="mb-0 mt-2"><em>{{ comparison.transition_difficulty.experience_factor }}</em></p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row comparison-container">
+                <!-- First Career Details -->
+                <div class="col-md-6 comparison-col">
+                    <div class="card comparison-card shadow-sm">
+                        <div class="card-header comparison-header">
+                            <h3 class="mb-0">{{ career1 }}</h3>
+                        </div>
+                        <div class="card-body">
+                            <p>{{ comparison.overview.career1.description }}</p>
+                            
+                            <div class="mb-3 p-3 bg-light rounded">
+                                <h5>Skill Match: {{ comparison.overview.career1.skill_match }}%</h5>
+                                <h6 class="mt-3 mb-2">Matching Skills:</h6>
+                                <div>
+                                    {% for skill in comparison.overview.career1.matching_skills %}
+                                        <span class="badge bg-success me-1 mb-1">{{ skill }}</span>
+                                    {% endfor %}
+                                </div>
+                                
+                                <h6 class="mt-3 mb-2">Missing Skills:</h6>
+                                <div>
+                                    {% for skill in comparison.overview.career1.missing_skills %}
+                                        <span class="badge bg-secondary me-1 mb-1">{{ skill }}</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            
+                            <table class="table comparison-table">
+                                <tbody>
+                                    <tr>
+                                        <th scope="row">Required Education</th>
+                                        <td>{{ comparison.education.career1.required }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Salary Range</th>
+                                        <td>{{ comparison.compensation.career1 }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Job Outlook</th>
+                                        <td>{{ comparison.outlook.career1 }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Work Environment</th>
+                                        <td>{{ comparison.work_environment.career1 }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            
+                            <h5 class="mt-4">Related Careers</h5>
+                            <ul>
+                                {% for related in comparison.related_careers.career1 %}
+                                    <li>{{ related }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Second Career Details -->
+                <div class="col-md-6 comparison-col">
+                    <div class="card comparison-card shadow-sm">
+                        <div class="card-header comparison-header" style="background-color: var(--bs-danger);">
+                            <h3 class="mb-0">{{ career2 }}</h3>
+                        </div>
+                        <div class="card-body">
+                            <p>{{ comparison.overview.career2.description }}</p>
+                            
+                            <div class="mb-3 p-3 bg-light rounded">
+                                <h5>Skill Match: {{ comparison.overview.career2.skill_match }}%</h5>
+                                <h6 class="mt-3 mb-2">Matching Skills:</h6>
+                                <div>
+                                    {% for skill in comparison.overview.career2.matching_skills %}
+                                        <span class="badge bg-success me-1 mb-1">{{ skill }}</span>
+                                    {% endfor %}
+                                </div>
+                                
+                                <h6 class="mt-3 mb-2">Missing Skills:</h6>
+                                <div>
+                                    {% for skill in comparison.overview.career2.missing_skills %}
+                                        <span class="badge bg-secondary me-1 mb-1">{{ skill }}</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            
+                            <table class="table comparison-table">
+                                <tbody>
+                                    <tr>
+                                        <th scope="row">Required Education</th>
+                                        <td>{{ comparison.education.career2.required }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Salary Range</th>
+                                        <td>{{ comparison.compensation.career2 }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Job Outlook</th>
+                                        <td>{{ comparison.outlook.career2 }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Work Environment</th>
+                                        <td>{{ comparison.work_environment.career2 }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            
+                            <h5 class="mt-4">Related Careers</h5>
+                            <ul>
+                                {% for related in comparison.related_careers.career2 %}
+                                    <li>{{ related }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Skill gap comparison -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="card shadow-sm">
+                        <div class="card-header">
+                            <h3 class="mb-0">Transition Plan</h3>
+                        </div>
+                        <div class="card-body">
+                            <h5>Skills to Develop for {{ career2 }}</h5>
+                            <div class="mb-4">
+                                {% for skill in comparison.transition_difficulty.skill_gap %}
+                                    <span class="badge bg-info me-1 mb-1">{{ skill }}</span>
+                                {% endfor %}
+                            </div>
+                            
+                            {% if comparison.transition_difficulty.additional_education %}
+                                <h5>Additional Education Needed</h5>
+                                <p>{{ comparison.transition_difficulty.additional_education[0] }}</p>
+                            {% endif %}
+                            
+                            <div class="alert alert-success mt-4">
+                                <h5 class="alert-heading">Next Steps</h5>
+                                <p class="mb-0">Based on your profile, here are some recommended next steps:</p>
+                                <ul class="mb-0 mt-2">
+                                    {% if comparison.transition_difficulty.level == "Easy" %}
+                                        <li>Update your resume to highlight transferable skills</li>
+                                        <li>Network with professionals in the {{ career2 }} field</li>
+                                        <li>Look for lateral transfer opportunities within your organization</li>
+                                    {% elif comparison.transition_difficulty.level == "Moderate" %}
+                                        <li>Take online courses to develop missing skills</li>
+                                        <li>Consider certification programs to validate your knowledge</li>
+                                        <li>Look for hybrid roles that combine aspects of both careers</li>
+                                    {% else %}
+                                        <li>Consider formal education or training programs</li>
+                                        <li>Look for entry-level or internship opportunities to gain experience</li>
+                                        <li>Develop a long-term transition plan with gradual skill building</li>
+                                    {% endif %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        {% else %}
+            <!-- RECOMMENDATION RESULTS -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card shadow-sm">
+                        <div class="card-header">
+                            <h3 class="mb-0">Your Career Recommendations</h3>
+                        </div>
+                        <div class="card-body">
+                            <p class="lead">Based on your skills, interests, and preferences, here are your top career matches:</p>
+                            
+                            <!-- Recommendation chart -->
+                            <div class="chart-container">
+                                <canvas id="recommendationChart" data-recommendations="{{ recommendations|tojson }}"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                {% for recommendation in recommendations %}
+                    <div class="col-lg-6 mb-4">
+                        <div class="card recommendation-card shadow-sm h-100">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h4 class="mb-0">{{ recommendation.career }}</h4>
+                                <span class="match-score">{{ recommendation.score }}% Match</span>
+                            </div>
+                            <div class="card-body">
+                                <p>{{ recommendation.details.description }}</p>
+                                
+                                <div class="mb-3">
+                                    <h5>Why this matches you:</h5>
+                                    <ul>
+                                        {% for reason in recommendation.match_reasons %}
+                                            <li>{{ reason }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <h5>Required Education</h5>
+                                        <p>{{ recommendation.details.required_education }}</p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h5>Salary Range</h5>
+                                        <p>{{ recommendation.details.salary_range }}</p>
+                                    </div>
+                                </div>
+                                
+                                <h5>Required Skills</h5>
+                                <div class="mb-3">
+                                    {% for skill in recommendation.details.required_skills %}
+                                        <span class="skill-tag {% if skill|lower in session.get('skills', [])|join(' ')|lower or skill|lower in session.get('resume_skills', [])|join(' ')|lower %}matched{% endif %}">{{ skill }}</span>
+                                    {% endfor %}
+                                </div>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <h5>Job Outlook</h5>
+                                        <p>{{ recommendation.details.job_outlook }}</p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h5>Work Environment</h5>
+                                        <p>{{ recommendation.details.work_environment }}</p>
+                                    </div>
+                                </div>
+                                
+                                <h5>Related Careers</h5>
+                                <div>
+                                    {% for related in recommendation.details.related_careers %}
+                                        <span class="badge bg-secondary me-1 mb-1">{{ related }}</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <a href="{{ url_for('roadmap') }}?preselect={{ recommendation.career|urlencode }}" class="btn btn-primary btn-sm">Create Career Roadmap</a>
+                                <a href="#" class="btn btn-outline-secondary btn-sm">Learn More</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            
+            <div class="row mt-3">
+                <div class="col-12">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h4>What's Next?</h4>
+                            <p>Now that you have your recommendations, here are some suggested next steps:</p>
+                            
+                            <div class="row g-4 mt-2">
+                                <div class="col-md-4">
+                                    <div class="d-flex">
+                                        <div class="flex-shrink-0">
+                                            <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                                <i class="fas fa-search text-white"></i>
+                                            </div>
+                                        </div>
+                                        <div class="ms-3">
+                                            <h5>Research</h5>
+                                            <p class="text-muted mb-0">Learn more about each recommended career through the resources provided.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-4">
+                                    <div class="d-flex">
+                                        <div class="flex-shrink-0">
+                                            <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                                <i class="fas fa-map-signs text-white"></i>
+                                            </div>
+                                        </div>
+                                        <div class="ms-3">
+                                            <h5>Create a Roadmap</h5>
+                                            <p class="text-muted mb-0">Select a career and use our roadmap tool to plan your journey.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-4">
+                                    <div class="d-flex">
+                                        <div class="flex-shrink-0">
+                                            <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                                <i class="fas fa-user-friends text-white"></i>
+                                            </div>
+                                        </div>
+                                        <div class="ms-3">
+                                            <h5>Network</h5>
+                                            <p class="text-muted mb-0">Connect with professionals in your chosen field to gain insights.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Call to action section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <h2 class="mb-4">Continue Your Career Exploration</h2>
+                
+                <div class="d-grid gap-3 d-sm-flex justify-content-sm-center">
+                    {% if result_type == 'roadmap' %}
+                        <a href="{{ url_for('comparison') }}?preselect={{ career|urlencode }}" class="btn btn-primary btn-lg px-4 gap-3">Compare With Another Career</a>
+                        <a href="{{ url_for('recommendation') }}" class="btn btn-outline-secondary btn-lg px-4">Get Career Recommendations</a>
+                    {% elif result_type == 'comparison' %}
+                        <a href="{{ url_for('roadmap') }}?preselect={{ career1|urlencode }}" class="btn btn-primary btn-lg px-4 gap-3">Create Career Roadmap</a>
+                        <a href="{{ url_for('recommendation') }}" class="btn btn-outline-secondary btn-lg px-4">Get More Recommendations</a>
+                    {% else %}
+                        <a href="{{ url_for('comparison') }}" class="btn btn-primary btn-lg px-4 gap-3">Compare Top Choices</a>
+                        <a href="{{ url_for('roadmap') }}" class="btn btn-outline-secondary btn-lg px-4">Create Career Roadmap</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block additional_scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Set up charts based on result type
+        
+        {% if result_type == 'roadmap' %}
+            // Roadmap chart
+            const roadmapChartElement = document.getElementById('roadmapChart');
+            if (roadmapChartElement) {
+                createRoadmapChart('roadmapChart', {{ roadmap.current_stage }});
+            }
+        {% elif result_type == 'comparison' %}
+            // Comparison radar chart
+            const comparisonChartElement = document.getElementById('comparisonChart');
+            if (comparisonChartElement) {
+                const data = {
+                    career1: {
+                        name: '{{ career1 }}',
+                        skillMatch: {{ comparison.overview.career1.skill_match }},
+                        educationFit: {{ 75 if comparison.education.career1.level_index >= 2 else 50 }},
+                        salaryPotential: {{ 80 if '$100,000' in comparison.compensation.career1 else 50 }},
+                        growthOutlook: {{ 80 if 'faster' in comparison.outlook.career1 else 50 }},
+                        workLifeBalance: 60
+                    },
+                    career2: {
+                        name: '{{ career2 }}',
+                        skillMatch: {{ comparison.overview.career2.skill_match }},
+                        educationFit: {{ 75 if comparison.education.career2.level_index >= 2 else 50 }},
+                        salaryPotential: {{ 80 if '$100,000' in comparison.compensation.career2 else 50 }},
+                        growthOutlook: {{ 80 if 'faster' in comparison.outlook.career2 else 50 }},
+                        workLifeBalance: 60
+                    }
+                };
+                createComparisonChart('comparisonChart', data);
+            }
+        {% else %}
+            // Recommendation chart
+            const recommendationChartElement = document.getElementById('recommendationChart');
+            if (recommendationChartElement) {
+                const recommendationsData = {{ recommendations|tojson }};
+                createRecommendationChart('recommendationChart', recommendationsData);
+            }
+        {% endif %}
+    });
+</script>
+{% endblock %}

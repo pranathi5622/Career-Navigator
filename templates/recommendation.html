@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+
+{% block title %}Career Recommendation System - Career Compass{% endblock %}
+
+{% block content %}
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h1 class="display-5 fw-bold">Career Recommendation System</h1>
+            <p class="lead">Discover career options aligned with your skills, interests, and preferences</p>
+        </div>
+        
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card shadow-sm">
+                    <div class="card-body p-4">
+                        <h3 class="card-title mb-4">Start Your Career Discovery Journey</h3>
+                        
+                        <p>Our recommendation system analyzes your skills, interests, and preferences to suggest careers that might be a good fit for you. We'll guide you through the process in two simple steps:</p>
+                        
+                        <div class="d-flex mb-4 mt-4">
+                            <div class="flex-shrink-0">
+                                <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                    <i class="fas fa-file-alt text-white"></i>
+                                </div>
+                            </div>
+                            <div class="ms-3">
+                                <h5>Step 1: Optional Resume Upload</h5>
+                                <p class="text-muted mb-0">Upload your resume so we can analyze your skills and experience. This step is optional but provides more accurate recommendations.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex mb-4">
+                            <div class="flex-shrink-0">
+                                <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                    <i class="fas fa-list-alt text-white"></i>
+                                </div>
+                            </div>
+                            <div class="ms-3">
+                                <h5>Step 2: Complete a Short Questionnaire</h5>
+                                <p class="text-muted mb-0">Answer questions about your interests, skills, values, and preferences to help us understand what matters most to you in a career.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 d-grid gap-3">
+                            <a href="{{ url_for('upload_resume', path_type='recommendation') }}" class="btn btn-primary btn-lg">Start with Resume Upload</a>
+                            <a href="{{ url_for('questionnaire') }}" class="btn btn-outline-primary btn-lg">Skip to Questionnaire</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card mt-4 shadow-sm">
+                    <div class="card-body p-4">
+                        <h4 class="card-title mb-3">Why Use Our Recommendation System?</h4>
+                        
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <div class="d-flex">
+                                    <div class="flex-shrink-0">
+                                        <i class="fas fa-bullseye text-primary fa-2x"></i>
+                                    </div>
+                                    <div class="ms-3">
+                                        <h5>Personalized Matches</h5>
+                                        <p class="text-muted small">Recommendations tailored to your unique combination of skills, interests, and values.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="d-flex">
+                                    <div class="flex-shrink-0">
+                                        <i class="fas fa-lightbulb text-primary fa-2x"></i>
+                                    </div>
+                                    <div class="ms-3">
+                                        <h5>Discover New Possibilities</h5>
+                                        <p class="text-muted small">Explore careers you might not have considered that match your profile.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="d-flex">
+                                    <div class="flex-shrink-0">
+                                        <i class="fas fa-info-circle text-primary fa-2x"></i>
+                                    </div>
+                                    <div class="ms-3">
+                                        <h5>Detailed Career Information</h5>
+                                        <p class="text-muted small">Learn about requirements, outlook, and resources for each recommended career.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="d-flex">
+                                    <div class="flex-shrink-0">
+                                        <i class="fas fa-tasks text-primary fa-2x"></i>
+                                    </div>
+                                    <div class="ms-3">
+                                        <h5>Actionable Next Steps</h5>
+                                        <p class="text-muted small">Get practical guidance on how to pursue or explore each recommended career path.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

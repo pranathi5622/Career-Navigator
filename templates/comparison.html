@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+
+{% block title %}Career Comparison Tool - Career Compass{% endblock %}
+
+{% block content %}
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h1 class="display-5 fw-bold">Career Comparison Tool</h1>
+            <p class="lead">Compare different career paths to make an informed decision</p>
+        </div>
+        
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card shadow-sm">
+                    <div class="card-body p-4">
+                        <h3 class="card-title mb-4">Step 1: Select Careers to Compare</h3>
+                        
+                        <form action="{{ url_for('comparison') }}" method="post" class="needs-validation" novalidate>
+                            {{ form.csrf_token }}
+                            
+                            <div class="mb-4">
+                                <label for="career1" class="form-label">First Career Option</label>
+                                <select class="form-select" id="career1" name="career1" required>
+                                    <option value="">Select first career</option>
+                                    {% for career in careers %}
+                                    <option value="{{ career }}">{{ career }}</option>
+                                    {% endfor %}
+                                </select>
+                                <div class="invalid-feedback">Please select the first career.</div>
+                                <div class="form-text">Choose the first career you want to compare.</div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label for="career2" class="form-label">Second Career Option</label>
+                                <select class="form-select" id="career2" name="career2" required>
+                                    <option value="">Select second career</option>
+                                    {% for career in careers %}
+                                    <option value="{{ career }}">{{ career }}</option>
+                                    {% endfor %}
+                                </select>
+                                <div class="invalid-feedback">Please select the second career.</div>
+                                <div class="form-text">Choose the second career you want to compare.</div>
+                            </div>
+                            
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary btn-lg">Continue to Resume Upload</button>
+                                <div class="text-center mt-2">
+                                    <small class="text-muted">In the next step, you'll be able to upload your resume for more personalized comparison insights.</small>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <div class="card mt-4 shadow-sm">
+                    <div class="card-body p-4">
+                        <h3 class="card-title mb-3">What You'll Compare</h3>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="fas fa-chart-line text-primary me-2"></i>
+                                    <h5 class="mb-0">Salary Potential</h5>
+                                </div>
+                                <p class="text-muted small">Compare earning potential and compensation ranges.</p>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="fas fa-graduation-cap text-primary me-2"></i>
+                                    <h5 class="mb-0">Education Requirements</h5>
+                                </div>
+                                <p class="text-muted small">See what degrees or certifications are needed.</p>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="fas fa-code-branch text-primary me-2"></i>
+                                    <h5 class="mb-0">Growth Opportunities</h5>
+                                </div>
+                                <p class="text-muted small">Understand job outlook and advancement paths.</p>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="fas fa-tools text-primary me-2"></i>
+                                    <h5 class="mb-0">Required Skills</h5>
+                                </div>
+                                <p class="text-muted small">See which skills you have and which you need to develop.</p>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="fas fa-building text-primary me-2"></i>
+                                    <h5 class="mb-0">Work Environment</h5>
+                                </div>
+                                <p class="text-muted small">Compare typical work settings and culture.</p>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="fas fa-exchange-alt text-primary me-2"></i>
+                                    <h5 class="mb-0">Transition Difficulty</h5>
+                                </div>
+                                <p class="text-muted small">How hard it would be to switch between these careers.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
