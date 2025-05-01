@@ -38,12 +38,6 @@
                     <li class="nav-item">
                         <a class="nav-link {% if request.path == url_for('recommendation') %}active{% endif %}" href="{{ url_for('recommendation') }}">Career Recommendation</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link {% if 'optimize' in request.path %}active{% endif %}" href="{{ url_for('upload_resume', path_type='optimize') }}">Resume Optimization</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {% if request.path == url_for('mood_tracker') %}active{% endif %}" href="{{ url_for('mood_tracker') }}">Mood Tracker</a>
-                    </li>
                 </ul>
             </div>
         </div>
@@ -83,8 +77,6 @@
                         <li><a href="{{ url_for('roadmap') }}" class="text-light">Career Roadmap</a></li>
                         <li><a href="{{ url_for('comparison') }}" class="text-light">Career Comparison</a></li>
                         <li><a href="{{ url_for('recommendation') }}" class="text-light">Career Recommendation</a></li>
-                        <li><a href="{{ url_for('upload_resume', path_type='optimize') }}" class="text-light">Resume Optimization</a></li>
-                        <li><a href="{{ url_for('mood_tracker') }}" class="text-light">Mood Tracker</a></li>
                     </ul>
                 </div>
                 <div class="col-md-3">

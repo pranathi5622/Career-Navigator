@@ -44,12 +44,10 @@ with app.app_context():
     db.create_all()
 
 # Import routes and forms
-from forms import CareerForm, ComparisonForm, QuestionnaireForm, ResumeUploadForm, MoodEntryForm
+from forms import CareerForm, ComparisonForm, QuestionnaireForm, ResumeUploadForm
 from resume_parser import process_resume_file
 from recommendation_engine import get_career_recommendations, get_career_roadmap, compare_careers
 from career_data import get_career_details, get_all_careers
-from resume_optimizer import generate_optimization_suggestions
-from models import MoodEntry
 
 # Route for home page
 @app.route('/')
@@ -146,57 +144,10 @@ def upload_resume(path_type):
                 return redirect(url_for('comparison_result'))
             elif path_type == 'recommendation':
                 return redirect(url_for('questionnaire'))
-            elif path_type == 'optimize':
-                return redirect(url_for('optimize_resume'))
     
     return render_template('upload_resume.html', path_type=path_type)
 
-@app.route('/optimize_resume', methods=['GET', 'POST'])
-def optimize_resume():
-    """
-    Route for resume optimization feature
-    """
-    all_careers = get_all_careers()
-    form = CareerForm()
-    
-    if form.validate_on_submit():
-        target_career = form.career.data
-        
-        # Get resume filepath from session
-        resume_filepath = session.get('resume_filepath')
-        
-        if not resume_filepath or not os.path.exists(resume_filepath):
-            flash('Resume file not found. Please upload your resume again.', 'danger')
-            return redirect(url_for('upload_resume', path_type='optimize'))
-        
-        # Generate optimization suggestions
-        optimization_results = generate_optimization_suggestions(resume_filepath, target_career)
-        
-        # Store results in session
-        session['optimization_results'] = optimization_results
-        
-        # Clean up file after generating suggestions
-        if os.path.exists(resume_filepath):
-            os.remove(resume_filepath)
-            session.pop('resume_filepath', None)
-            
-        return redirect(url_for('optimization_results'))
-    
-    return render_template('optimize_resume.html', form=form, careers=all_careers)
 
-@app.route('/optimization_results')
-def optimization_results():
-    """
-    Route to display resume optimization results
-    """
-    # Get optimization results from session
-    results = session.get('optimization_results')
-    
-    if not results:
-        flash('No optimization results found. Please upload your resume and select a target career.', 'warning')
-        return redirect(url_for('upload_resume', path_type='optimize'))
-    
-    return render_template('optimization_results.html', results=results)
 
 # Routes for results
 @app.route('/roadmap_result')
@@ -268,104 +219,7 @@ def recommendation_result():
                           result_type='recommendation',
                           recommendations=recommendations)
 
-# Mood tracker routes
-@app.route('/mood_tracker', methods=['GET'])
-def mood_tracker():
-    """
-    Display mood tracking dashboard
-    """
-    # Placeholder for current user - in a real app, you'd use the logged-in user
-    # For now, we'll just use a placeholder user_id
-    user_id = 1
-    
-    form = MoodEntryForm()
-    
-    # Get the user's mood entries, ordered by date descending
-    mood_entries = MoodEntry.query.filter_by(user_id=user_id).order_by(MoodEntry.entry_date.desc()).limit(30).all()
-    
-    # Prepare data for charts
-    dates = []
-    moods = []
-    career_satisfaction = []
-    work_life_balance = []
-    stress_levels = []
-    
-    for entry in mood_entries:
-        dates.append(entry.entry_date.strftime("%Y-%m-%d"))
-        moods.append(entry.mood)
-        career_satisfaction.append(entry.career_satisfaction)
-        work_life_balance.append(entry.work_life_balance)
-        stress_levels.append(entry.stress_level)
-    
-    # Reverse lists to display oldest to newest
-    dates.reverse()
-    moods.reverse()
-    career_satisfaction.reverse()
-    work_life_balance.reverse()
-    stress_levels.reverse()
-    
-    # Convert Python lists to JSON for JavaScript
-    chart_data = {
-        'dates': dates,
-        'moods': moods,
-        'career_satisfaction': career_satisfaction,
-        'work_life_balance': work_life_balance,
-        'stress_levels': stress_levels
-    }
-    
-    return render_template('mood_tracker.html', form=form, mood_entries=mood_entries, chart_data=chart_data)
 
-@app.route('/mood_entry', methods=['POST'])
-def mood_entry():
-    """
-    Add a new mood entry
-    """
-    form = MoodEntryForm()
-    
-    if form.validate_on_submit():
-        # Placeholder for current user - in a real app, you'd use the logged-in user
-        user_id = 1
-        
-        # Create new mood entry
-        new_entry = MoodEntry(
-            user_id=user_id,
-            mood=form.mood.data,
-            career_satisfaction=form.career_satisfaction.data,
-            work_life_balance=form.work_life_balance.data,
-            stress_level=form.stress_level.data,
-            notes=form.notes.data
-        )
-        
-        db.session.add(new_entry)
-        db.session.commit()
-        
-        flash('Your mood has been recorded!', 'success')
-        return redirect(url_for('mood_tracker'))
-    else:
-        for field, errors in form.errors.items():
-            for error in errors:
-                flash(f'{getattr(form, field).label.text}: {error}', 'danger')
-    
-    return redirect(url_for('mood_tracker'))
-
-@app.route('/delete_mood_entry/<int:entry_id>', methods=['POST'])
-def delete_mood_entry(entry_id):
-    """
-    Delete a mood entry
-    """
-    # Placeholder for current user - in a real app, you'd use the logged-in user
-    user_id = 1
-    
-    entry = MoodEntry.query.filter_by(id=entry_id, user_id=user_id).first()
-    
-    if entry:
-        db.session.delete(entry)
-        db.session.commit()
-        flash('Mood entry deleted successfully!', 'success')
-    else:
-        flash('Mood entry not found.', 'danger')
-    
-    return redirect(url_for('mood_tracker'))
 
 
 
